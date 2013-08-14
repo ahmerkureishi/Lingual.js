@@ -1,0 +1,103 @@
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <title data-translate="title"></title>
+        <style type="text/css">
+            #options,
+            #translations{
+                display: inline-block;
+                vertical-align: top;
+                }
+            #options{
+                border-right: 1px solid #eee;
+                padding-right: 10px;
+                margin-right: 10px;
+                }
+                #options > div{
+                    margin-bottom: 10px;
+                    }
+            #area{
+                width: 500px;
+                margin: 50px auto;
+                }
+        </style>
+    </head>
+    <body>
+        
+        <div id="area">
+        
+            <div id="options">
+                <div>
+                    <label for="name">Name: </label>
+                    <input type="text" id="name" value="Maker">
+                </div>
+                <div>
+                    <label for="locale">Locale: </label>
+                    <select id="locale">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="de">German</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <input type="button" id="add" value="Add dynamic HTML">
+                </div>
+                
+            </div>
+            
+            
+            <div id="translations">
+                <div data-translate="welcome"></div>
+            
+                <div id="append"></div>
+            </div>
+            
+            
+            
+        </div>
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="../src/translate.js"></script>
+        <script>
+            window.onload = function(){
+                
+                window.translator = new Translate({    
+                    "en": {
+                        "welcome": "Welcome to our Site",
+                        "title": "Translate.js Demo",
+                        "dynamic": "Good day, :name!"
+                        
+                    },
+                    "es": {
+                        "welcome": "Bienvenido a nuestro sitio",
+                        "title": "Translate.js demostración",
+                        "dynamic": "Buenos dias, :name!"
+                    },
+                    "de": {
+                        "welcome": "Willkommen auf unserer Seite",
+                        "title": "Translate.js Demo",
+                        "dynamic": "Guten Tag , :name!"
+                    }
+                });
+                
+                
+                $(document).on('click', '#add', function(){
+                    
+                    $('#append').append( '<div data-translate="dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></div>' );
+                    
+                });
+                
+                $(document).on('change', '#locale', function(){
+                    window.translator.locale(this.value);
+                    window.translator.translate();
+                });
+                
+                /*document.getElementById('add').addEventListener('click', function(){
+                    document.getElementById('toAdd').innerHTML = '<div data-translate="dynamic" data-vars="'+JSON.stringify([2])+'"></div>';
+                });*/
+                
+            };
+        </script>
+    </body>
+</html>
