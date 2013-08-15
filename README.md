@@ -119,9 +119,8 @@ translator.gettext("foo", ["Vars"]);
 
 ## Todo
 
-[x] Infinite depth of locales (i.e. `<data-translate="support.intro.welcome"></div>`)
-[ ] Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
-[ ] Simplistic pluralization rules for most languages
+* Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
+* Simplistic pluralization rules for most languages
 
 
 ## Licensing
