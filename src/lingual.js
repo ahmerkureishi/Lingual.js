@@ -7,6 +7,7 @@
         var settings = {
                 lang: undef
             },
+            
             cache = {
                 strings: {}
             },
@@ -30,7 +31,49 @@
                         jx.send();
                     }
                 },
-
+                
+                parsePath: (function(input) {
+    
+                    var delimiter = input.delimiter || '/',
+                        paths = input.path.split(delimiter),
+                        check = input.target[paths.shift()],
+                        exists = typeof check != 'undefined',
+                        isLast = paths.length == 0;
+                
+                    if (exists) {
+                        if (isLast) {
+                            input.parsed.call(undefined, {
+                                exists: true,
+                                type: typeof check,
+                                obj: check
+                            });
+                        } else {
+                            utils.parsePath({
+                                path: paths.join(delimiter), 
+                                target: check,
+                                delimiter: delimiter,
+                                parsed: input.parsed
+                            });
+                        }
+                    } else {
+                        input.parsed.call(undefined, {
+                            exists: false
+                        });
+                    }
+                }),
+                
+                setHooks: function(){
+                    var i;
+                    for(i=0; i<settings.hooks.length; i++){
+                        var curMethod = settings.hooks[i];
+                        settings.hooks[i] = alert;
+                    }
+                },
+                
+                hasMutationEvents: function(){
+                    return ("MutationEvent" in w);
+                },
+                
                 initLanguage: function(){
                     utils.setLang( cache.html.getAttribute('lang') || navigator.language.split('-')[0] || "en" );
                 },
@@ -109,14 +152,21 @@
                     for(i=0; i<toTranslate.length; i++){
                         var el = toTranslate[i],
                             key = utils.getByAttr('data-translate', el),
-                            vars = JSON.parse(utils.getByAttr('data-vars', el)),
-                            translation = cache.strings[settings.lang][key];
-
-                        if( key && translation){
-                            if( vars ){
-                                translation = utils.injectVars(translation, vars);
-                            }
-                            el.innerHTML = translation;
+                            vars = JSON.parse(utils.getByAttr('data-vars', el));
+                        if( key ){
+                            utils.parsePath({
+                                path: key,
+                                target: cache.strings[settings.lang],
+                                parsed: function(translation){
+                                    if( translation.exists ){
+                                        translation = translation.obj;
+                                        if( vars ){
+                                            translation = utils.injectVars(translation, vars);
+                                        }
+                                        el.innerHTML = translation;
+                                    }
+                                }
+                            });
                         }
                     }
                 },
@@ -135,7 +185,12 @@
                 },
                 post: function(locales){
                     utils.setStrings( locales );
-                    action.listen();
+                    
+                    if( utils.hasMutationEvents() ){
+                        action.listen();
+                    } else {
+                        utils.setHooks();
+                    }
                 }
             };
 
@@ -154,9 +209,9 @@
                 return utils.injectVars(cache.strings[settings.lang][key], vars);
             };
             
-            /*
-             * Begin initializing languages
-             */
+            
+            // Begin
+            
             init.pre();
             
             if(typeof locales === "string" ){
