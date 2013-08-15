@@ -27,6 +27,7 @@ var translate = new Lingual('path/to/translations_en.json');
 ```javascript
 var translate = new Lingual('path/to/translations_%LANG%.json');
 ```
+`%LANG%` will dynamically be replaced by the language that is automatically detected.
 
 ##### Including translations directly
 ```javascript
@@ -100,6 +101,13 @@ Returns the translation for the specified key with an optional `vars` parameter 
 ```javascript
 translator.gettext("foo", ["Vars"]);
 ```
+
+## Todo
+
+- [ ] Infinite depth of locales (i.e. `<data-translate="support.intro.welcome"></div>`)
+- [ ] Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
+- [ ] Simplistic pluralization rules for most languages
+
 
 ## Licensing
 MIT
