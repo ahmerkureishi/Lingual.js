@@ -20,12 +20,12 @@ Currently, there are three ways to initialize Lingual.js. Initializing consists 
 
 ##### Using Ajax to load specified language
 ```javascript
-var translate = new Lingual('path/to/translations_en.json');
+var translate = new Lingual('path/to/translations_en.json', settings);
 ```
 
 ##### Using Ajax to load language dynamically
 ```javascript
-var translate = new Lingual('path/to/translations_%LANG%.json');
+var translate = new Lingual('path/to/translations_%LANG%.json', settings);
 ```
 `%LANG%` will dynamically be replaced by the language that is automatically detected.
 
@@ -35,9 +35,16 @@ var translate = new Lingual({
     "en": {
         "foo": "bar"
     }
-});
+}, settings);
 ```
 
+### Default Settings
+```javascript
+var settings = {
+    lang: undefined,
+    pathDelimiter: '.',
+};
+```
 
 ### Setting the Language
 
@@ -56,6 +63,13 @@ Lingual.js aims to be as simple as possible. The main method of translating stri
 ```
 
 This will look for the `foo` key within the locale object set earlier and set the div's contents to that string.
+
+You can use an infinite depth of keys to pull from. For example:
+```html
+<div data-translate="foo.subKey.something.else"></div>
+```
+
+This will look deeper within the object, allowing you to organize your translations. You can change the delimiter used by settings `pathDelimiter` in the settings object.
 
 ### Using dynamic variables
 
