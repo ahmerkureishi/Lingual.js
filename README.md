@@ -45,6 +45,7 @@ var settings = {
     pathDelimiter: '.',
 };
 ```
+Pass an object literal as the second parameter of the constructor method to set the settings to use for the instantiated object.
 
 ### Setting the Language
 
@@ -94,7 +95,7 @@ If you were to dynamically add an element to the DOM that has a `data-translate`
 ## Public Methods
 
 ```javascript
-var translator = new Lingual(/* opts */);
+var translator = new Lingual(/* locales, settings */);
 ```
 
 #### `.locale(String locale)`
@@ -118,9 +119,9 @@ translator.gettext("foo", ["Vars"]);
 
 ## Todo
 
-- [ ] Infinite depth of locales (i.e. `<data-translate="support.intro.welcome"></div>`)
-- [ ] Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
-- [ ] Simplistic pluralization rules for most languages
+[x] Infinite depth of locales (i.e. `<data-translate="support.intro.welcome"></div>`)
+[ ] Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
+[ ] Simplistic pluralization rules for most languages
 
 
 ## Licensing
