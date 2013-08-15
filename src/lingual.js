@@ -2,10 +2,11 @@
 
     "use strict";
 
-    var Lingual = Lingual || function(locales) {
+    var Lingual = Lingual || function(locales, opts) {
 
-        var settings = {
-                lang: undef
+        var defaults = {
+                lang: undef,
+                pathDelimiter: '.'
             },
             
             cache = {
@@ -32,9 +33,22 @@
                     }
                 },
                 
+                deepExtend: function(destination, source) {
+                    for (var property in source) {
+                        if (source[property] && source[property].constructor &&
+                            source[property].constructor === Object) {
+                            destination[property] = destination[property] || {};
+                            utils.deepExtend(destination[property], source[property]);
+                        } else {
+                            destination[property] = source[property];
+                        }
+                    }
+                    return destination;
+                },
+                
                 parsePath: (function(input) {
     
-                    var delimiter = input.delimiter || '/',
+                    var delimiter = input.delimiter || defaults.pathDelimiter,
                         paths = input.path.split(delimiter),
                         check = input.target[paths.shift()],
                         exists = typeof check != 'undefined',
@@ -64,9 +78,9 @@
                 
                 setHooks: function(){
                     var i;
-                    for(i=0; i<settings.hooks.length; i++){
-                        var curMethod = settings.hooks[i];
-                        settings.hooks[i] = alert;
+                    for(i=0; i<defaults.hooks.length; i++){
+                        var curMethod = defaults.hooks[i];
+                        defaults.hooks[i] = alert;
                     }
                 },
                 
@@ -79,13 +93,13 @@
                 },
                 setLang: function(lang){
                     cache.html.setAttribute('lang', lang);
-                    settings.lang = lang;
+                    defaults.lang = lang;
                 },
                 tag: function(t){
                     return d.getElementsByTagName(t)[0];
                 },
                 setStrings: function(locales){
-                    cache.strings = locales;//cache.strings[settings.lang] = ( typeof locales[settings.lang] !== 'undefined' ) ? locales[settings.lang] : locales;
+                    cache.strings = locales;
                     return this;
                 },
                 getByAttr: function(attr, el){
@@ -156,7 +170,7 @@
                         if( key ){
                             utils.parsePath({
                                 path: key,
-                                target: cache.strings[settings.lang],
+                                target: cache.strings[defaults.lang],
                                 parsed: function(translation){
                                     if( translation.exists ){
                                         translation = translation.obj;
@@ -179,7 +193,8 @@
             },
 
             init = {
-                pre: function(){
+                pre: function(opts){
+                    utils.deepExtend(defaults, opts);
                     cache.html = utils.tag('html');
                     utils.initLanguage();
                 },
@@ -193,36 +208,35 @@
                     }
                 }
             };
-
+            
             this.locale = function(locale){
                 if( typeof cache.strings[locale] !== "undefined" ){
-                    settings.lang = locale;
+                    defaults.lang = locale;
                 } else {
                     console.warn( 'Cannot change language, translations for "'+locale+'" do not exist!' );
                 }
-                
             };
             this.translate = function(){
                 action.translate();
             };
             this.gettext = function(key, vars){
-                return utils.injectVars(cache.strings[settings.lang][key], vars);
+                return utils.injectVars(cache.strings[defaults.lang][key], vars);
             };
             
             
-            // Begin
+            // Initialize shit
             
-            init.pre();
+            init.pre(opts);
             
             if(typeof locales === "string" ){
             
-                locales = locales.replace('%LANG%', settings.lang);
+                locales = locales.replace('%LANG%', defaults.lang);
             
                 utils.ajax.get(locales, function(res){
                     locales = JSON.parse(res);
-                    if(typeof locales[settings.lang] === "undefined"){
+                    if(typeof locales[defaults.lang] === "undefined"){
                         var newLocales = {};
-                        newLocales[settings.lang] = locales;
+                        newLocales[defaults.lang] = locales;
                         locales = newLocales;
                     }
                     init.post( locales );

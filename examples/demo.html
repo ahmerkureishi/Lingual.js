@@ -48,7 +48,7 @@
             
             
             <div id="translations">
-                <div data-translate="welcome"></div>
+                <div data-translate="test.deep.welcome"></div>
             
                 <div id="append"></div>
             </div>
@@ -64,10 +64,13 @@
                 
                 window.translator = new Lingual({    
                     "en": {
-                        "welcome": "Welcome to our Site",
-                        "title": "Lingual.js Demo",
-                        "dynamic": "Good day, :name!"
-                        
+                        "test": {
+                            "deep": {
+                                "welcome": "Welcome to our Site",
+                                "title": "Lingual.js Demo",
+                                "dynamic": "Good day, :name!"
+                            }
+                        }
                     },
                     "es": {
                         "welcome": "Bienvenido a nuestro sitio",
@@ -81,10 +84,9 @@
                     }
                 });
                 
-                
                 $(document).on('click', '#add', function(){
                     
-                    $('#append').append( '<div data-translate="dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></div>' );
+                    $('#append').append( '<div data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></div>' );
                     
                 });
                 
