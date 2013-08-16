@@ -17,12 +17,7 @@
 
                 ajax: {
                     get: function(url, fn){
-                        var jx;
-                        if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
-                            jx = new XMLHttpRequest();
-                        } else { // code for IE6, IE5
-                            jx = new ActiveXObject("Microsoft.XMLHTTP");
-                        }
+                        var jx = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
                         jx.onreadystatechange = function () {
                             if (jx.readyState == 4 && jx.status == 200) {
                                 fn.call(null, jx.responseText);
