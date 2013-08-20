@@ -8,13 +8,10 @@
                 lang: '',
                 pathDelimiter: '.'
             },
-            
             cache = {
                 strings: {}
             },
-
             utils = {
-
                 ajax: {
                     get: function(url, fn){
                         var jx = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
@@ -27,7 +24,6 @@
                         jx.send();
                     }
                 },
-                
                 deepExtend: function(destination, source) {
                     for (var property in source) {
                         if (source[property] && source[property].constructor &&
@@ -40,9 +36,7 @@
                     }
                     return destination;
                 },
-                
                 parsePath: function(target, path){
-
                     var parts = path.split( defaults.pathDelimiter ),
                         exists = true,
                         i;
@@ -56,7 +50,6 @@
                     }
                     return exists ? target : exists;
                 },
-                
                 setHooks: function(){
                     var i;
                     for(i=0; i<defaults.hooks.length; i++){
@@ -64,11 +57,9 @@
                         defaults.hooks[i] = alert;
                     }
                 },
-                
                 hasMutationEvents: function(){
                     return ("MutationEvent" in w);
                 },
-                
                 initLanguage: function(){
                     utils.setLang( cache.html.getAttribute('lang') || navigator.language.split('-')[0] || "en" );
                 },
@@ -168,7 +159,6 @@
                     }
                 }
             },
-
             init = {
                 pre: function(opts){
                     utils.deepExtend(defaults, opts);
@@ -185,12 +175,10 @@
                     }
                 }
             };
-            
+
             this.locale = function(locale){
                 if( typeof cache.strings[locale] !== "undefined" ){
                     defaults.lang = locale;
-                } else {
-                    console.warn( 'Cannot change language, translations for "'+locale+'" do not exist!' );
                 }
             };
             this.translate = function(){
@@ -199,16 +187,14 @@
             this.gettext = function(key, vars){
                 return utils.injectVars(cache.strings[defaults.lang][key], vars);
             };
-            
-            
+
             // Initialize shit
-            
             init.pre(opts);
-            
+
             if(typeof locales === "string" ){
-            
+
                 locales = locales.replace('%LANG%', defaults.lang);
-            
+
                 utils.ajax.get(locales, function(res){
                     locales = JSON.parse(res);
                     if(typeof locales[defaults.lang] === "undefined"){
