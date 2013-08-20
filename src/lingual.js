@@ -1,11 +1,11 @@
-(function (w, d, undef) {
+(function (w, d) {
 
     "use strict";
 
     var Lingual = Lingual || function(locales, opts) {
 
         var defaults = {
-                lang: undef,
+                lang: '',
                 pathDelimiter: '.'
             },
             
@@ -41,35 +41,21 @@
                     return destination;
                 },
                 
-                parsePath: (function(input) {
-    
-                    var delimiter = input.delimiter || defaults.pathDelimiter,
-                        paths = input.path.split(delimiter),
-                        check = input.target[paths.shift()],
-                        exists = typeof check != 'undefined',
-                        isLast = paths.length == 0;
-                
-                    if (exists) {
-                        if (isLast) {
-                            input.parsed.call(undefined, {
-                                exists: true,
-                                type: typeof check,
-                                obj: check
-                            });
+                parsePath: function(target, path){
+
+                    var parts = path.split( defaults.pathDelimiter ),
+                        exists = true,
+                        i;
+                    for(i=0; i<parts.length; i++){
+                        var part = parts[i];
+                        if( target[ part ] ){
+                            target = target[ part ];
                         } else {
-                            utils.parsePath({
-                                path: paths.join(delimiter), 
-                                target: check,
-                                delimiter: delimiter,
-                                parsed: input.parsed
-                            });
+                            exists = false;
                         }
-                    } else {
-                        input.parsed.call(undefined, {
-                            exists: false
-                        });
                     }
-                }),
+                    return exists ? target : exists;
+                },
                 
                 setHooks: function(){
                     var i;
@@ -91,10 +77,11 @@
                     defaults.lang = lang;
                 },
                 tag: function(t){
-                    return d.getElementsByTagName(t)[0];
+                    var el = d.getElementsByTagName(t);
+                    return (el[0]) || null;
                 },
-                setStrings: function(locales){
-                    cache.strings = locales;
+                setStrings: function(localeStrings){
+                    cache.strings = localeStrings;
                     return this;
                 },
                 getByAttr: function(attr, el){
@@ -121,7 +108,7 @@
                 // https://github.com/recurser/jquery-i18n/blob/master/src/jquery.i18n.js#L67-L97
                 injectVars: function(str, args) {
 
-                    if(args instanceof Array){
+                    if( Array.isArray(args) ){
                         if (!args){
                             return str;
                         }
@@ -163,19 +150,14 @@
                             key = utils.getByAttr('data-translate', el),
                             vars = JSON.parse(utils.getByAttr('data-vars', el));
                         if( key ){
-                            utils.parsePath({
-                                path: key,
-                                target: cache.strings[defaults.lang],
-                                parsed: function(translation){
-                                    if( translation.exists ){
-                                        translation = translation.obj;
-                                        if( vars ){
-                                            translation = utils.injectVars(translation, vars);
-                                        }
-                                        el.innerHTML = translation;
-                                    }
+                            var translation = utils.parsePath( cache.strings[defaults.lang], key );
+                            
+                            if( translation ){
+                                if( vars ){
+                                    translation = utils.injectVars(translation, vars);
                                 }
-                            });
+                                el.innerHTML = translation;
+                            }
                         }
                     }
                 },
