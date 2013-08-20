@@ -42,13 +42,13 @@
                         i;
                     for(i=0; i<parts.length; i++){
                         var part = parts[i];
-                        if( target[ part ] ){
+                        if( typeof target[ part ] !== "undefined" ){
                             target = target[ part ];
                         } else {
-                            exists = false;
+                            return false;
                         }
                     }
-                    return exists ? target : exists;
+                    return target;
                 },
                 setHooks: function(){
                     var i;
