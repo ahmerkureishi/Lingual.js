@@ -142,7 +142,7 @@
                             vars = JSON.parse(utils.getByAttr('data-vars', el));
                         if( key ){
                             var translation = utils.parsePath( cache.strings[defaults.lang], key );
-                            
+
                             if( translation ){
                                 if( vars ){
                                     translation = utils.injectVars(translation, vars);
@@ -155,7 +155,7 @@
                 listen: function(){
                     if( cache.strings ){
                         action.translate();
-                        d.addEventListener('DOMNodeInserted', action.translate);
+                        //d.addEventListener('DOMNodeInserted', action.translate);
                     }
                 }
             },
@@ -167,7 +167,7 @@
                 },
                 post: function(locales){
                     utils.setStrings( locales );
-                    
+
                     if( utils.hasMutationEvents() ){
                         action.listen();
                     } else {
