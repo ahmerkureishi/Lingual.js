@@ -79,11 +79,11 @@
 			 */
 			injectVars: function(str, args) {
 				args = args || {};
-                var key;
-                for(key in args){
-                    str = str.replace(':'+key, args[key]);
-                }
-                return str;
+				var key;
+				for(key in args){
+					str = str.replace(':'+key, args[key]);
+				}
+				return str;
 			}
 		};
 
