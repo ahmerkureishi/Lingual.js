@@ -188,8 +188,7 @@
 
 			locales = locales.replace('%LANG%', defaults.lang);
 
-			$.getJSON(locales, function(res){
-				locales = JSON.parse(res);
+			$.getJSON(locales, function(locales){
 				if(typeof locales[defaults.lang] === "undefined"){
 					var newLocales = {};
 					newLocales[defaults.lang] = locales;
