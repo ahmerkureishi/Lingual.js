@@ -23,9 +23,9 @@
         </style>
     </head>
     <body>
-        
+
         <div id="area">
-        
+
             <div id="options">
                 <div>
                     <label for="name">Name: </label>
@@ -39,30 +39,34 @@
                         <option value="de">German</option>
                     </select>
                 </div>
-                
+
                 <div>
                     <input type="button" id="add" value="Add dynamic HTML">
                 </div>
-                
+
             </div>
-            
-            
+
+
             <div id="translations">
                 <div data-translate="test.deep.welcome"></div>
-            
+                <input type="button" data-translate="test.deep.welcome" data-translate-target="value">
+                <button data-translate="test.deep.welcome" data-translate-target="text"></button>
+
+                <input type="text" data-translate="test.deep.welcome" data-translate-target="placeholder">
+
                 <div id="append"></div>
             </div>
-            
-            
-            
+
+
+
         </div>
-        
+
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="../src/lingual.js"></script>
+        <script src="../src/lingual.jquery.js"></script>
         <script>
-            window.onload = function(){
-                
-                window.translator = new Lingual({    
+            $(document).ready(function(){
+
+                var translator = new Lingual({
                     "en": {
                         "test": {
                             "deep": {
@@ -91,23 +95,20 @@
                         }
                     }
                 });
-                
+
                 $(document).on('click', '#add', function(){
-                    
+
                     $('#append').append( '<div data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></div>' );
-                    
+                    translator.translate();
+
                 });
-                
+
                 $(document).on('change', '#locale', function(){
-                    window.translator.locale(this.value);
-                    window.translator.translate();
+                    translator.locale(this.value);
+                    translator.translate();
                 });
-                
-                /*document.getElementById('add').addEventListener('click', function(){
-                    document.getElementById('toAdd').innerHTML = '<div data-translate="dynamic" data-vars="'+JSON.stringify([2])+'"></div>';
-                });*/
-                
-            };
+
+            });
         </script>
     </body>
 </html>
