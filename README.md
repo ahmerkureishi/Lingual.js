@@ -74,7 +74,7 @@ You can use an infinite depth of keys to pull from. For example:
 You can specify certain attributes to be translated
 ```html
 <input type="button" data-translate="foo" data-translate-target="value">
-<! -- or -->
+<!-- or -->
 <input type="text" data-translate="foo" data-translate-target="placeholder">
 ```
 
