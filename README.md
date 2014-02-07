@@ -9,7 +9,7 @@ Crazy simple client side localisation
 Include lingual.js in the head of your document or directly below the closing body tag.
 
 ```html
-<script src="src/lingual.js"></script>
+<script src="src/lingual.jquery.js"></script>
 ```
 
 ## Initializing
@@ -43,6 +43,7 @@ var translate = new Lingual({
 var settings = {
     lang: undefined,
     pathDelimiter: '.',
+    selectorKey: 'translate' // data-translate etc
 };
 ```
 Pass an object literal as the second parameter of the constructor method to set the settings to use for the instantiated object.
@@ -70,26 +71,29 @@ You can use an infinite depth of keys to pull from. For example:
 <div data-translate="foo.subKey.something.else"></div>
 ```
 
+You can specify certain attributes to be translated
+```html
+<input type="button" data-translate="foo" data-translate-target="value">
+<! -- or -->
+<input type="text" data-translate="foo" data-translate-target="placeholder">
+```
+
 This will look deeper within the object, allowing you to organize your translations. You can change the delimiter used by settings `pathDelimiter` in the settings object.
 
 ### Using dynamic variables
 
-There are two ways to inject dynamic data into translations. One is by using an array, and the other uses object literals.
+You can pass dynamic data to the strings to be interpolated. Currently, the only type of data replacement supported is with an object literal.
 
 ```javascript
 var translate = new Lingual({
     "en": {
-        "sampleArray": "Hello, %s!",
         "sampleObject": "Hello, :name!"
     }
 });
 ```
 ```html
-<div data-translate="sampleArray" data-vars='["Jacob"]'></div> <!-- Produces "Hello, Jacob!" -->
 <div data-translate="sampleObject" data-vars='{"name": "Jacob"}'></div> <!-- Produces "Hello, Jacob!" -->
 ```
-
-If you were to dynamically add an element to the DOM that has a `data-translate` attribute, it will automatically be translated.
 
 
 ## Public Methods
@@ -105,8 +109,8 @@ translator.locale("es");
 ```
 
 
-#### `.translate()`
-Translate all DOM elements to the set locale
+#### `.translate($Element)`
+Translate all DOM elements to the set locale. If there is a jQuery object passed as a parameter, the translations will only occur within the scope of that object.
 ```javascript
 translator.translate();
 ```
@@ -118,8 +122,6 @@ translator.gettext("foo", ["Vars"]);
 ```
 
 ## Todo
-
-* Method overriding to extend support of automatic translations for browsers that do not support DOM Mutators
 * Simplistic pluralization rules for most languages
 
 
