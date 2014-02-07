@@ -1,14 +1,14 @@
 {
-  "name": "Lingual.js",
-  "version": "1.1.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MakerStudios/lingual.git"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-cli": "~0.1.9",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-uglify": "0.2.5"
-  }
+	"name": "Lingual.js",
+	"version": "1.1.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MakerStudios/lingual.git"
+	},
+	"devDependencies": {
+		"grunt": "~0.4.1",
+		"grunt-cli": "~0.1.9",
+		"grunt-contrib-watch": "~0.5.3",
+		"grunt-contrib-uglify": "0.2.5"
+	}
 }

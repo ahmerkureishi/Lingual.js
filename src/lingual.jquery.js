@@ -93,11 +93,11 @@
 			 * Translates all of the elements on a page
 			 * @return {null}
 			 */
-			translate: function(){
+			translate: function($el){
 
 
 				var selectorKey = defaults.selectorKey,
-					$toTranslate = $('[data-'+selectorKey+']');
+					$toTranslate = $('[data-'+selectorKey+']', $el);
 
 				$toTranslate.each(function(){
 					var $this = $(this),
@@ -167,8 +167,8 @@
 		 * Translates all elements on the page
 		 * @return {null}
 		 */
-		self.translate = function(){
-			action.translate();
+		self.translate = function($el){
+			action.translate($el);
 		};
 
 		/**

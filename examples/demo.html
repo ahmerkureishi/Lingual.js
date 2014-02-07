@@ -2,67 +2,61 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <title data-translate="title"></title>
+        <link rel="stylesheet" type="text/css" href="http://thundercats.makerstudios.com/code/latest/tc.css">
         <style type="text/css">
-            #options,
-            #translations{
-                display: inline-block;
-                vertical-align: top;
-                }
-            #options{
-                border-right: 1px solid #eee;
-                padding-right: 10px;
-                margin-right: 10px;
-                }
-                #options > div{
-                    margin-bottom: 10px;
-                    }
-            #area{
-                width: 500px;
-                margin: 50px auto;
-                }
+            body{padding-top: 50px;}
+            .unit.text-right{border-right: 1px solid #eee;}
         </style>
     </head>
     <body>
 
-        <div id="area">
+        <div class="container">
+            <div class="row">
+                <div class="unit half text-right">
+                    <h3 class="m-bottom-more">Controls</h3>
+                    <div id="options">
+                        <div class="form-group">
+                            <label for="name">Name: </label>
+                            <input type="text" id="name" value="Maker">
+                        </div>
+                        <div class="form-group">
+                            <label for="locale">Locale: </label>
+                            <select id="locale">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="de">German</option>
+                            </select>
+                        </div>
 
-            <div id="options">
-                <div>
-                    <label for="name">Name: </label>
-                    <input type="text" id="name" value="Maker">
-                </div>
-                <div>
-                    <label for="locale">Locale: </label>
-                    <select id="locale">
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="de">German</option>
-                    </select>
+                        <div class="form-group">
+                            <input type="button" id="add" value="Add dynamic HTML" class="btn">
+                        </div>
+
+                    </div>
                 </div>
 
-                <div>
-                    <input type="button" id="add" value="Add dynamic HTML">
+                <div class="unit half">
+                    <h3 class="m-bottom-more">Translated</h3>
+                    <div id="translations">
+                        <div data-translate="test.deep.welcome" class="m-top-more m-bottom-more"></div>
+                        <div class="form-group">
+                            <input type="button" data-translate="test.deep.welcome" data-translate-target="value" class="btn">
+                        </div>
+                        <div class="form-group">
+                            <button data-translate="test.deep.welcome" data-translate-target="text" class="btn"></button>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" data-translate="test.deep.welcome" data-translate-target="placeholder">
+                        </div>
+                        <div id="append"></div>
+                    </div>
                 </div>
-
             </div>
-
-
-            <div id="translations">
-                <div data-translate="test.deep.welcome"></div>
-                <input type="button" data-translate="test.deep.welcome" data-translate-target="value">
-                <button data-translate="test.deep.welcome" data-translate-target="text"></button>
-
-                <input type="text" data-translate="test.deep.welcome" data-translate-target="placeholder">
-
-                <div id="append"></div>
-            </div>
-
-
-
         </div>
 
+
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="../src/lingual.jquery.js"></script>
+        <script src="../dist/lingual.jquery.min.js"></script>
         <script>
             $(document).ready(function(){
 
@@ -97,10 +91,8 @@
                 });
 
                 $(document).on('click', '#add', function(){
-
-                    $('#append').append( '<div data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></div>' );
-                    translator.translate();
-
+                    $('#append').append( $('<div class="margin"><span class="highlight" data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></span></div>') );
+                    translator.translate( $('#append div:last') );
                 });
 
                 $(document).on('change', '#locale', function(){
