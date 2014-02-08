@@ -88,9 +88,9 @@
 				args = args || {};
 				var key;
 				for(key in args){
-		  if(args.hasOwnProperty(key)){
+					if(args.hasOwnProperty(key)){
 						str = str.replace(':'+key, args[key]);
-		  }
+					}
 				}
 				return str;
 			}
