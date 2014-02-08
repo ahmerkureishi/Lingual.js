@@ -125,6 +125,7 @@
 						}
 					}
 				});
+				($el || $(d)).trigger('translated');
 			}
 		};
 
