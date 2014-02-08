@@ -40,14 +40,15 @@
                     <div id="translations">
                         <div data-translate="test.deep.welcome" class="m-top-more m-bottom-more"></div>
                         <div class="form-group">
-                            <input type="button" data-translate="test.deep.welcome" data-translate-target="value" class="btn">
+                            <input type="button" data-translate="value: test.deep.welcome" class="btn">
                         </div>
                         <div class="form-group">
-                            <button data-translate="test.deep.welcome" data-translate-target="text" class="btn"></button>
+                            <button data-translate="text: test.deep.welcome" class="btn"></button>
                         </div>
                         <div class="form-group">
-                            <input type="text" data-translate="test.deep.welcome" data-translate-target="placeholder">
+                            <input type="text" data-translate="placeholder: test.deep.welcome">
                         </div>
+                        <a href="#" data-translate="text: test.deep.welcome" class="btn pull-right"></a>
                         <div id="append"></div>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
 
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="../dist/lingual.jquery.min.js"></script>
+        <script src="../src/lingual.jquery.js"></script>
         <script>
             $(document).ready(function(){
 

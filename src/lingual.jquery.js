@@ -1,20 +1,23 @@
-(function (w, d, $) {
+(function (d, $) {
 
 	"use strict";
 
-	var Lingual = Lingual || function(locales, opts) {
+	var Namespace = 'Lingual';
+
+	var App = App || function(locales, opts) {
 
 		var self = this,
-			defaults,
 			cache,
 			utils,
 			action,
 			init;
 
-		defaults = {
+		self.defaults = {
 			lang: '',
 			pathDelimiter: '.',
-			selectorKey: 'translate'
+			selectorKey: 'translate',
+			fixFloats: true,
+			debug: true
 		};
 
 		cache = {
@@ -22,6 +25,12 @@
 		};
 
 		utils = {
+
+			log: function(what){
+				if(self.defaults.debug){
+					console.log(what);
+				}
+			},
 
 			/**
 			 * Parses a string to compare against the existance of a like hash
@@ -31,8 +40,7 @@
 			 */
 			parsePath: function(target, path){
 				if (!path) return false;
-				var parts = path.split( defaults.pathDelimiter ),
-					exists = true,
+				var parts = path.split( self.defaults.pathDelimiter ),
 					i;
 				for(i=0; i<parts.length; i++){
 					var part = parts[i];
@@ -59,7 +67,7 @@
 			 */
 			setLang: function(lang){
 				cache.html.attr('lang', lang);
-				defaults.lang = lang;
+				self.defaults.lang = lang;
 			},
 
 			/**
@@ -69,7 +77,6 @@
 			setStrings: function(localeStrings){
 				cache.strings = localeStrings;
 			},
-
 
 			/**
 			 * Replaces named variables in a string with their respective values
@@ -81,7 +88,9 @@
 				args = args || {};
 				var key;
 				for(key in args){
-					str = str.replace(':'+key, args[key]);
+		  if(args.hasOwnProperty(key)){
+						str = str.replace(':'+key, args[key]);
+		  }
 				}
 				return str;
 			}
@@ -95,32 +104,71 @@
 			 */
 			translate: function($el){
 
-
-				var selectorKey = defaults.selectorKey,
-					$toTranslate = $('[data-'+selectorKey+']', $el);
+				// Gather our elements
+				var selectorKey = self.defaults.selectorKey,
+					attributeName = 'data-'+selectorKey,
+					$toTranslate = $('['+attributeName+']', $el);
 
 				$toTranslate.each(function(){
 					var $this = $(this),
-						key = $this.attr('data-'+selectorKey);
+						translateAttr = $this.attr(attributeName);
 
-					if(key){
-						var translation = utils.parsePath( cache.strings[defaults.lang], key );
+					if(translateAttr){
+
+						// Check if we are setting an attribute: my.translate.key
+						var keyData = translateAttr.split(':');
+
+						// If there is a translateAttr, set it to translateTarget
+						var translateTarget = (keyData.length>1) ? keyData[0] : false;
+
+						// If there is a translateTarget, move over one index
+						var translateKey = translateTarget ? keyData[1] : keyData[0];
+
+						// Make sure our translate key is valid
+						if(!translateKey || translateTarget == attributeName){
+							return;
+						} else {
+							translateKey = translateKey.trim();
+						}
+
+						// Fetch our translation
+						var translation = utils.parsePath( cache.strings[self.defaults.lang], translateKey );
 
 						if(translation){
-							var vars = $this.attr('data-vars');
-							if(vars){
-								translation = utils.injectVars(translation, JSON.parse(vars));
-							}
-							var target = $this.attr('data-'+selectorKey+'-target');
 
-							if(!target){
+							// Check if we need to inject data into our  translation
+							var translateVars = $this.attr('data-vars');
+							if(translateVars){
+								try{
+									translateVars = JSON.parse(translateVars);
+									translation = utils.injectVars(translation, translateVars);
+								} catch(e){
+									if(self.defaults.debug){
+										utils.log('Invalid JSON: ' + translateVars);
+									}
+								}
+							}
+
+							// If we don't have a translation target, default to html
+							if( translateTarget === false || translateTarget == 'html' ){
 								$this.html(translation);
 							} else {
-								if(target == 'text' ){
+
+								// a translate target of "text" does not mean an attribute "text"
+								if(translateTarget == 'text' ){
 									$this.text(translation);
 								} else {
-									$this.attr(target, translation);
+									// Set our translated attribute
+									$this.attr(translateTarget, translation);
 								}
+							}
+
+							// Some browsers freak out with floated elements that have no "layout"
+							if(self.defaults.fixFloats){
+								$this.css('display', $this.css('display'));
+								setTimeout(function(){
+									$this.css('display', '');
+								}, 1);
 							}
 						}
 					}
@@ -137,7 +185,7 @@
 			 * @return {null}
 			 */
 			pre: function(opts){
-				defaults = $.extend(defaults, opts);
+				self.defaults = $.extend(self.defaults, opts);
 				cache.html = $('html');
 				utils.initLanguage();
 			},
@@ -160,7 +208,7 @@
 		 */
 		self.locale = function(locale){
 			if( typeof cache.strings[locale] !== "undefined" ){
-				defaults.lang = locale;
+				self.defaults.lang = locale;
 			}
 		};
 
@@ -179,7 +227,7 @@
 		 * @return {String} The translated text
 		 */
 		self.gettext = function(key, vars){
-			return utils.injectVars(utils.parsePath(cache.strings[defaults.lang], key), vars);
+			return utils.injectVars(utils.parsePath(cache.strings[self.defaults.lang], key), vars);
 		};
 
 		// Initialize shit
@@ -187,12 +235,12 @@
 
 		if(typeof locales === "string" ){
 
-			locales = locales.replace('%LANG%', defaults.lang);
+			locales = locales.replace('%LANG%', self.defaults.lang);
 
 			$.getJSON(locales, function(locales){
-				if(typeof locales[defaults.lang] === "undefined"){
+				if(typeof locales[self.defaults.lang] === "undefined"){
 					var newLocales = {};
-					newLocales[defaults.lang] = locales;
+					newLocales[self.defaults.lang] = locales;
 					locales = newLocales;
 				}
 				init.post( locales );
@@ -206,6 +254,6 @@
 	 * Assign Lingual to the global namespace
 	 * @type {Object}
 	 */
-	this.Lingual = Lingual;
+	this[Namespace] = App;
 
-}).call(this, window, document, jQuery);
+}).call(this, document, jQuery);
