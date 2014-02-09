@@ -55,41 +55,12 @@
             </div>
         </div>
 
-
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="../src/lingual.jquery.js"></script>
+        <script src="../../src/lingual.js"></script>
         <script>
             $(document).ready(function(){
 
-                var translator = new Lingual({
-                    "en": {
-                        "test": {
-                            "deep": {
-                                "welcome": "Welcome to our Site",
-                                "title": "Lingual.js Demo",
-                                "dynamic": "Good day, :name!"
-                            }
-                        }
-                    },
-                    "es": {
-                        "test": {
-                            "deep": {
-                                "welcome": "Bienvenido a nuestro sitio",
-                                "title": "Lingual.js demostración",
-                                "dynamic": "Buenos dias, :name!"
-                            }
-                        }
-                    },
-                    "de": {
-                        "test": {
-                            "deep": {
-                                "welcome": "Willkommen auf unserer Seite",
-                                "title": "Lingual.js Demo",
-                                "dynamic": "Guten Tag , :name!"
-                            }
-                        }
-                    }
-                });
+                var translator = new Lingual('locales/locales.json');
 
                 $(document).on('click', '#add', function(){
                     $('#append').append( $('<div class="margin"><span class="highlight" data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></span></div>') );

@@ -1,8 +1,9 @@
-(function (d, $) {
+(function (d, nav, $) {
 
 	"use strict";
 
 	var Namespace = 'Lingual';
+	var IsServer = (typeof module !== 'undefined' && module.exports);
 
 	var App = App || function(locales, opts) {
 
@@ -13,7 +14,7 @@
 			init;
 
 		self.defaults = {
-			lang: '',
+			lang: 'en',
 			pathDelimiter: '.',
 			selectorKey: 'translate',
 			fixFloats: true,
@@ -26,10 +27,23 @@
 
 		utils = {
 
+			/**
+			 * Our logging abstraction
+			 * @param  {Variable} what Anything you'd want to log
+			 * @return {null}
+			 */
 			log: function(what){
 				if(self.defaults.debug){
 					console.log(what);
 				}
+			},
+
+			/**
+			 * Only runs the function if on the Client
+			 * @param  {Function} fn The function to run
+			 */
+			client: function(fn){
+				if($ && d) return fn.call();
 			},
 
 			/**
@@ -57,8 +71,8 @@
 			 * Sets up our default language based off of various conditions
 			 * @return {null}
 			 */
-			initLanguage: function(){
-				utils.setLang( cache.html.attr('lang') || navigator.language.split('-')[0] || "en" );
+			initLanguage: function(lang){
+				utils.setLang( lang || self.defaults.lang );
 			},
 
 			/**
@@ -66,7 +80,9 @@
 			 * @param {null} lang
 			 */
 			setLang: function(lang){
-				cache.html.attr('lang', lang);
+				utils.client(function(){
+					cache.html.attr('lang', lang);
+				});
 				self.defaults.lang = lang;
 			},
 
@@ -74,7 +90,7 @@
 			 * Sets translations to be used
 			 * @param {String} localeStrings A Hash of strings to be used for injecting into the page
 			 */
-			setStrings: function(localeStrings){
+			setLocales: function(localeStrings){
 				cache.strings = localeStrings;
 			},
 
@@ -180,14 +196,48 @@
 		init = {
 
 			/**
-			 * Initializes options and settings before potentially sending a request for locales
-			 * @param  {Object} opts The options for the Lingual API
+			 * Client side initializer
+			 * @param  {Object|String}  Hash of locale strings to set
+			 * @param  {Object} opts    Lingual.js options
 			 * @return {null}
 			 */
-			pre: function(opts){
+			client: function(locales, opts){
+
+				// Extend our options
 				self.defaults = $.extend(self.defaults, opts);
 				cache.html = $('html');
+
+				// Set our current language
+				utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || nav.language.split('-')[0] );
+
+				// Set locales
+				if(typeof locales === "string" ){
+					$.getJSON( locales.replace('%LANG%', self.defaults.lang) , function(locales){
+						init.finish( locales );
+					});
+					return;
+				}
+				init.finish(locales);
+			},
+
+			/**
+			 * Server side initializer
+			 * @param  {Object} locales Hash of locale strings to set
+			 * @param  {Object} opts    Lingual.js options
+			 * @return {null}
+			 */
+			server: function(locales, opts){
+
+				// Extend our options
+				var extend = require('node.extend');
+				self.defaults = extend(self.defaults, opts);
+
+				// Set our current language
 				utils.initLanguage();
+
+				// Set locales
+				init.finish(locales);
+
 			},
 
 			/**
@@ -195,9 +245,22 @@
 			 * @param  {Object} locales The hash of locales to be set for use
 			 * @return {null}
 			 */
-			post: function(locales){
-				utils.setStrings( locales );
-				action.translate();
+			finish: function(locales){
+
+				// Make sure our locales are stored under their language key
+				if(typeof locales[self.defaults.lang] === "undefined"){
+					var newLocales = {};
+					newLocales[self.defaults.lang] = locales;
+					locales = newLocales;
+				}
+
+				// Set locales
+				utils.setLocales( locales );
+
+				// If we're on the client, translate automatically
+				utils.client(function(){
+					action.translate();
+				});
 			}
 		};
 
@@ -207,6 +270,9 @@
 		 * @return {null}
 		 */
 		self.locale = function(locale){
+			if(typeof locale == 'undefined'){
+				return self.defaults.lang;
+			}
 			if( typeof cache.strings[locale] !== "undefined" ){
 				self.defaults.lang = locale;
 			}
@@ -217,11 +283,13 @@
 		 * @return {null}
 		 */
 		self.translate = function($el){
-			action.translate($el);
+			utils.client(function(){
+				action.translate($el);
+			});
 		};
 
 		/**
-		 * The Javascript API for translating certain keys
+		 * Translates the specified key
 		 * @param  {String} key  The languages text key in your locale hash
 		 * @param  {Object} vars A hash of the variables you want replaced within the text
 		 * @return {String} The translated text
@@ -231,29 +299,18 @@
 		};
 
 		// Initialize shit
-		init.pre(opts);
-
-		if(typeof locales === "string" ){
-
-			locales = locales.replace('%LANG%', self.defaults.lang);
-
-			$.getJSON(locales, function(locales){
-				if(typeof locales[self.defaults.lang] === "undefined"){
-					var newLocales = {};
-					newLocales[self.defaults.lang] = locales;
-					locales = newLocales;
-				}
-				init.post( locales );
-			});
+		if( IsServer ){
+			init.server(locales, opts);
 		} else {
-			init.post(locales);
+			init.client(locales, opts);
 		}
 	};
 
-	/**
-	 * Assign Lingual to the global namespace
-	 * @type {Object}
-	 */
-	this[Namespace] = App;
+	// Assign Lingual to the global namespace
+	if (IsServer) {
+		module.exports = App;
+	} else {
+		this[Namespace] = App;
+	}
 
-}).call(this, document, jQuery);
+}).apply(this, (typeof document !== "undefined") ? [document, navigator, jQuery] : [] );

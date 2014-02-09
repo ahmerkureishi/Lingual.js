@@ -13,27 +13,28 @@ module.exports = function(grunt) {
             },
             main: {
                 files: {
-                    'dist/lingual.jquery.min.js': ['src/lingual.jquery.js']
+                    'dist/lingual.min.js': ['src/lingual.js']
                 }
             }
         },
 
         jshint: {
-            all: ['src/lingual.jquery.js'],
+            all: ['src/lingual.js'],
             options: {
                 curly: true,
                 eqnull: true,
                 browser: true,
                 globals: {
                     jQuery: true,
-                    $: true
+                    module: true,
+                    require: true
                 },
             },
         },
 
         watch: {
             scripts: {
-                files: 'src/lingual.jquery.js',
+                files: 'src/lingual.js',
                 tasks: ['uglify']
             }
         }

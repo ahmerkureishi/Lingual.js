@@ -1,0 +1,29 @@
+{
+    "en": {
+        "test": {
+            "deep": {
+                "welcome": "Welcome to our Site",
+                "title": "Lingual.js Demo",
+                "dynamic": "Good day, :name!"
+            }
+        }
+    },
+    "es": {
+        "test": {
+            "deep": {
+                "welcome": "Bienvenido a nuestro sitio",
+                "title": "Lingual.js demostración",
+                "dynamic": "Buenos dias, :name!"
+            }
+        }
+    },
+    "de": {
+        "test": {
+            "deep": {
+                "welcome": "Willkommen auf unserer Seite",
+                "title": "Lingual.js Demo",
+                "dynamic": "Guten Tag , :name!"
+            }
+        }
+    }
+}
