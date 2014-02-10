@@ -22,7 +22,7 @@
             "deep": {
                 "welcome": "Willkommen auf unserer Seite",
                 "title": "Lingual.js Demo",
-                "dynamic": "Guten Tag , :name!"
+                "dynamic": "Guten Tag, :name!"
             }
         }
     }

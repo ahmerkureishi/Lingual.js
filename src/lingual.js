@@ -22,7 +22,7 @@
 		};
 
 		cache = {
-			strings: {}
+			localeStrings: {}
 		};
 
 		utils = {
@@ -91,7 +91,7 @@
 			 * @param {String} localeStrings A Hash of strings to be used for injecting into the page
 			 */
 			setLocales: function(localeStrings){
-				cache.strings = localeStrings;
+				cache.localeStrings = localeStrings;
 			},
 
 			/**
@@ -148,7 +148,7 @@
 						}
 
 						// Fetch our translation
-						var translation = utils.parsePath( cache.strings[self.defaults.lang], translateKey );
+						var translation = utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
 
 						if(translation){
 
@@ -273,7 +273,7 @@
 			if(typeof locale == 'undefined'){
 				return self.defaults.lang;
 			}
-			if( typeof cache.strings[locale] !== "undefined" ){
+			if( typeof cache.localeStrings[locale] !== "undefined" ){
 				self.defaults.lang = locale;
 			}
 		};
@@ -295,7 +295,7 @@
 		 * @return {String} The translated text
 		 */
 		self.gettext = function(key, vars){
-			return utils.injectVars(utils.parsePath(cache.strings[self.defaults.lang], key), vars);
+			return utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars);
 		};
 
 		// Initialize shit
