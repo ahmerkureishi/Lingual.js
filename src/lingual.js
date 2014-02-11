@@ -14,10 +14,11 @@
 			init;
 
 		self.defaults = {
-			lang: 'en',
+			lang: '',
 			pathDelimiter: '.',
 			selectorKey: 'translate',
 			fixFloats: true,
+			variants: false,
 			debug: true
 		};
 
@@ -43,7 +44,9 @@
 			 * @param  {Function} fn The function to run
 			 */
 			client: function(fn){
-				if($ && d) return fn.call();
+				if($ && d){
+					return fn.call();
+				}
 			},
 
 			/**
@@ -53,7 +56,9 @@
 			 * @return {Boolean}       Returns the existance of the object
 			 */
 			parsePath: function(target, path){
-				if (!path) return false;
+				if (!path){
+					return false;
+				}
 				var parts = path.split( self.defaults.pathDelimiter ),
 					i;
 				for(i=0; i<parts.length; i++){
@@ -189,6 +194,8 @@
 						}
 					}
 				});
+
+				// Trigger our translated event on our element or the document
 				($el || $(d)).trigger('translated');
 			}
 		};
@@ -208,7 +215,8 @@
 				cache.html = $('html');
 
 				// Set our current language
-				utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || nav.language.split('-')[0] );
+				var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
+				utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || detected || 'en' );
 
 				// Set locales
 				if(typeof locales === "string" ){
