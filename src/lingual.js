@@ -216,11 +216,13 @@
 
 							// Some browsers freak out with floated elements that have no "layout"
 							if(self.defaults.fixFloats){
-								$this.css('display', $this.css('display'));
+								$this.css('display', 'none');
 								setTimeout(function(){
 									$this.css('display', '');
-								}, 1);
+								}, 0);
 							}
+						} else {
+							utils.log('Could not find translation for '+translateKey);
 						}
 					}
 				});
