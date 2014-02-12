@@ -15,9 +15,10 @@
 
 		self.defaults = {
 			lang: '',
+			fallbackLang: 'en',
 			pathDelimiter: '.',
 			selectorKey: 'translate',
-			cache: true,
+			cache: false,
 			fixFloats: true,
 			variants: false,
 			debug: true
@@ -253,9 +254,6 @@
 				// Set locales
 				if(typeof locales === "string" ){
 
-					// Our real URL
-					var localeLocation = locales.replace('%LANG%', self.defaults.lang);
-
 					// Check if we have cached data. If so, use it
 					if( self.defaults.cache && utils.cache.supported() ){
 						var cached = utils.cache.get(localeLocation);
@@ -264,7 +262,7 @@
 						}
 					}
 
-					$.getJSON( localeLocation , function(locales){
+					$.getJSON( locales , function(locales){
 
 						// Set cache data
 						if( self.defaults.cache && utils.cache.supported() ){
@@ -304,11 +302,10 @@
 			 */
 			finish: function(locales){
 
-				// Make sure our locales are stored under their language key
-				if(typeof locales[self.defaults.lang] === "undefined"){
-					var newLocales = {};
-					newLocales[self.defaults.lang] = locales;
-					locales = newLocales;
+				// Make sure our language exists, elsewise default to "en"
+				if(!locales[self.defaults.lang]){
+					utils.log('Locales "'+self.defaults.lang+'" do not exist, falling back to "'+self.defaults.fallbackLang+'"');
+					utils.setLang(self.defaults.fallbackLang);
 				}
 
 				// Set locales
