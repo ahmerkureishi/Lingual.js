@@ -217,9 +217,10 @@
 
 							// Some browsers freak out with floated elements that have no "layout"
 							if(self.defaults.fixFloats){
+								var display = $this.css('display');
 								$this.css('display', 'none');
 								setTimeout(function(){
-									$this.css('display', '');
+									$this.css('display', display);
 								}, 0);
 							}
 						} else {
