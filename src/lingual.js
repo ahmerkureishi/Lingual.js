@@ -1,4 +1,4 @@
-(function (d, nav, $) {
+(function (w, d, nav, $) {
 
 	"use strict";
 
@@ -17,6 +17,7 @@
 			lang: '',
 			pathDelimiter: '.',
 			selectorKey: 'translate',
+			cache: true,
 			fixFloats: true,
 			variants: false,
 			debug: true
@@ -46,6 +47,35 @@
 			client: function(fn){
 				if($ && d){
 					return fn.call();
+				}
+			},
+
+			cache: {
+
+				/**
+				 * Determines if localStorage is supported by the current browser
+				 * @return {Boolean} If true, browser supports localStorage
+				 */
+				supported: function(){
+					return 'localStorage' in w;
+				},
+
+				/**
+				 * Gets an item from local storage
+				 * @param  {String} key The key name to fetch
+				 * @return {Object}     The data that was stored
+				 */
+				get: function(key){
+					return JSON.parse( w.localStorage.getItem(key) );
+				},
+
+				/**
+				 * Sets an item in local storage
+				 * @param {String} key The key name to save data as
+				 * @param {Object} val The data to save
+				 */
+				set: function(key, val){
+					return w.localStorage.setItem( key, JSON.stringify(val) );
 				}
 			},
 
@@ -220,7 +250,24 @@
 
 				// Set locales
 				if(typeof locales === "string" ){
-					$.getJSON( locales.replace('%LANG%', self.defaults.lang) , function(locales){
+
+					// Our real URL
+					var localeLocation = locales.replace('%LANG%', self.defaults.lang);
+
+					// Check if we have cached data. If so, use it
+					if( self.defaults.cache && utils.cache.supported() ){
+						var cached = utils.cache.get(localeLocation);
+						if( cached ){
+							return init.finish( cached );
+						}
+					}
+
+					$.getJSON( localeLocation , function(locales){
+
+						// Set cache data
+						if( self.defaults.cache && utils.cache.supported() ){
+							utils.cache.set(localeLocation, locales);
+						}
 						init.finish( locales );
 					});
 					return;
@@ -269,6 +316,8 @@
 				utils.client(function(){
 					action.translate();
 				});
+
+				cache.finish = new Date().getTime();
 			}
 		};
 
@@ -306,6 +355,8 @@
 			return utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars);
 		};
 
+		cache.start = new Date().getTime();
+
 		// Initialize shit
 		if( IsServer ){
 			init.server(locales, opts);
@@ -321,4 +372,4 @@
 		this[Namespace] = App;
 	}
 
-}).apply(this, (typeof document !== "undefined") ? [document, navigator, jQuery] : [] );
+}).apply(this, (typeof document !== "undefined") ? [window, document, navigator, jQuery] : [] );
