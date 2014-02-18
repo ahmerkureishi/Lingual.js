@@ -21,7 +21,7 @@
         "test": {
             "deep": {
                 "welcome": "Willkommen auf unserer Seite",
-                "title": "Lingual.js Demo",
+                "title": "Lingual.js Beispiel",
                 "dynamic": "Guten Tag, :name!"
             }
         }
