@@ -217,10 +217,28 @@
 
 							// Some browsers freak out with floated elements that have no "layout"
 							if(self.defaults.fixFloats){
+
+								// Save our display state
 								var display = $this.css('display');
+
+								// Hide the element
 								$this.css('display', 'none');
+
+								// Thread for new browser reflow
 								setTimeout(function(){
-									$this.css('display', display);
+
+									// *Reset* to default display
+									$this.css('display', '');
+
+									// If the display is different, that means the elements display style was set inline, so restore
+									if($this.css('display') !== display) {
+										$this.css('display', display);
+									} else
+
+									// If our style attribute is empty, remove it
+									if($this.attr('style') === ''){
+										$this.removeAttr('style');
+									}
 								}, 0);
 							}
 						} else {
