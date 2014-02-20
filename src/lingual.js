@@ -1,384 +1,384 @@
 (function (w, d, nav, $) {
 
-	"use strict";
+    "use strict";
 
-	var Namespace = 'Lingual';
-	var IsServer = (typeof module !== 'undefined' && module.exports);
+    var Namespace = 'Lingual';
+    var IsServer = (typeof module !== 'undefined' && module.exports);
 
-	var App = App || function(locales, opts) {
+    var App = App || function(locales, opts) {
 
-		var self = this,
-			cache,
-			utils,
-			action,
-			init;
+        var self = this,
+            cache,
+            utils,
+            action,
+            init;
 
-		self.defaults = {
-			lang: '',
-			fallbackLang: 'en',
-			pathDelimiter: '.',
-			selectorKey: 'translate',
-			cache: false,
-			fixFloats: true,
-			variants: false,
-			debug: true
-		};
+        self.defaults = {
+            lang: '',
+            fallbackLang: 'en',
+            pathDelimiter: '.',
+            selectorKey: 'translate',
+            cache: false,
+            fixFloats: true,
+            variants: false,
+            debug: true
+        };
 
-		cache = {
-			localeStrings: {}
-		};
+        cache = {
+            localeStrings: {}
+        };
 
-		utils = {
+        utils = {
 
-			/**
-			 * Our logging abstraction
-			 * @param  {Variable} what Anything you'd want to log
-			 * @return {null}
-			 */
-			log: function(what){
-				if(self.defaults.debug){
-					console.log(what);
-				}
-			},
+            /**
+             * Our logging abstraction
+             * @param  {Variable} what Anything you'd want to log
+             * @return {null}
+             */
+            log: function(what){
+                if(self.defaults.debug){
+                    console.log(what);
+                }
+            },
 
-			/**
-			 * Only runs the function if on the Client
-			 * @param  {Function} fn The function to run
-			 */
-			client: function(fn){
-				if($ && d){
-					return fn.call();
-				}
-			},
+            /**
+             * Only runs the function if on the Client
+             * @param  {Function} fn The function to run
+             */
+            client: function(fn){
+                if($ && d){
+                    return fn.call();
+                }
+            },
 
-			cache: {
+            cache: {
 
-				/**
-				 * Determines if localStorage is supported by the current browser
-				 * @return {Boolean} If true, browser supports localStorage
-				 */
-				supported: function(){
-					return 'localStorage' in w;
-				},
+                /**
+                 * Determines if localStorage is supported by the current browser
+                 * @return {Boolean} If true, browser supports localStorage
+                 */
+                supported: function(){
+                    return 'localStorage' in w;
+                },
 
-				/**
-				 * Gets an item from local storage
-				 * @param  {String} key The key name to fetch
-				 * @return {Object}     The data that was stored
-				 */
-				get: function(key){
-					return JSON.parse( w.localStorage.getItem(key) );
-				},
+                /**
+                 * Gets an item from local storage
+                 * @param  {String} key The key name to fetch
+                 * @return {Object}     The data that was stored
+                 */
+                get: function(key){
+                    return JSON.parse( w.localStorage.getItem(key) );
+                },
 
-				/**
-				 * Sets an item in local storage
-				 * @param {String} key The key name to save data as
-				 * @param {Object} val The data to save
-				 */
-				set: function(key, val){
-					return w.localStorage.setItem( key, JSON.stringify(val) );
-				}
-			},
+                /**
+                 * Sets an item in local storage
+                 * @param {String} key The key name to save data as
+                 * @param {Object} val The data to save
+                 */
+                set: function(key, val){
+                    return w.localStorage.setItem( key, JSON.stringify(val) );
+                }
+            },
 
-			/**
-			 * Parses a string to compare against the existance of a like hash
-			 * @param  {String} target String to compare against, i.e. "path.within.a.hash"
-			 * @param  {Object} path   The hash to search within
-			 * @return {Boolean}       Returns the existance of the object
-			 */
-			parsePath: function(target, path){
-				if (!path){
-					return false;
-				}
-				var parts = path.split( self.defaults.pathDelimiter ),
-					i;
-				for(i=0; i<parts.length; i++){
-					var part = parts[i];
-					if( typeof target[ part ] !== "undefined" ){
-						target = target[ part ];
-					} else {
-						return false;
-					}
-				}
-				return target;
-			},
+            /**
+             * Parses a string to compare against the existance of a like hash
+             * @param  {String} target String to compare against, i.e. "path.within.a.hash"
+             * @param  {Object} path   The hash to search within
+             * @return {Boolean}       Returns the existance of the object
+             */
+            parsePath: function(target, path){
+                if (!path){
+                    return false;
+                }
+                var parts = path.split( self.defaults.pathDelimiter ),
+                    i;
+                for(i=0; i<parts.length; i++){
+                    var part = parts[i];
+                    if( typeof target[ part ] !== "undefined" ){
+                        target = target[ part ];
+                    } else {
+                        return false;
+                    }
+                }
+                return target;
+            },
 
-			/**
-			 * Sets up our default language based off of various conditions
-			 * @return {null}
-			 */
-			initLanguage: function(lang){
-				utils.setLang( lang || self.defaults.lang );
-			},
+            /**
+             * Sets up our default language based off of various conditions
+             * @return {null}
+             */
+            initLanguage: function(lang){
+                utils.setLang( lang || self.defaults.lang );
+            },
 
-			/**
-			 * Sets the language on the HTML tag and within our library
-			 * @param {null} lang
-			 */
-			setLang: function(lang){
-				utils.client(function(){
-					cache.html.attr('lang', lang);
-				});
-				self.defaults.lang = lang;
-			},
+            /**
+             * Sets the language on the HTML tag and within our library
+             * @param {null} lang
+             */
+            setLang: function(lang){
+                utils.client(function(){
+                    cache.html.attr('lang', lang);
+                });
+                self.defaults.lang = lang;
+            },
 
-			/**
-			 * Sets translations to be used
-			 * @param {String} localeStrings A Hash of strings to be used for injecting into the page
-			 */
-			setLocales: function(localeStrings){
-				cache.localeStrings = localeStrings;
-			},
+            /**
+             * Sets translations to be used
+             * @param {String} localeStrings A Hash of strings to be used for injecting into the page
+             */
+            setLocales: function(localeStrings){
+                cache.localeStrings = localeStrings;
+            },
 
-			/**
-			 * Replaces named variables in a string with their respective values
-			 * @param  {String} str  The string to replace text within
-			 * @param  {Object} args The values to inject into the string
-			 * @return {String}      The updated string
-			 */
-			injectVars: function(str, args) {
-				args = args || {};
-				var key;
-				for(key in args){
-					if(args.hasOwnProperty(key)){
-						str = str.replace(':'+key, args[key]);
-					}
-				}
-				return str;
-			}
-		};
+            /**
+             * Replaces named variables in a string with their respective values
+             * @param  {String} str  The string to replace text within
+             * @param  {Object} args The values to inject into the string
+             * @return {String}      The updated string
+             */
+            injectVars: function(str, args) {
+                args = args || {};
+                var key;
+                for(key in args){
+                    if(args.hasOwnProperty(key)){
+                        str = str.replace(':'+key, args[key]);
+                    }
+                }
+                return str;
+            }
+        };
 
-		action = {
+        action = {
 
-			/**
-			 * Translates all of the elements on a page
-			 * @return {null}
-			 */
-			translate: function($el){
+            /**
+             * Translates all of the elements on a page
+             * @return {null}
+             */
+            translate: function($el){
 
-				// Gather our elements
-				var selectorKey = self.defaults.selectorKey,
-					attributeName = 'data-'+selectorKey,
-					$toTranslate = $('['+attributeName+']', $el);
+                // Gather our elements
+                var selectorKey = self.defaults.selectorKey,
+                    attributeName = 'data-'+selectorKey,
+                    $toTranslate = $('['+attributeName+']', $el);
 
-				if(self.defaults.fixFloats){
-					var hideClass = Namespace+'-hide';
-					$('head').append('<style type="text/css">.'+hideClass+'{display: none !important}</style>');
-				}
+                if(self.defaults.fixFloats){
+                    var hideClass = Namespace+'-hide';
+                    $('head').append('<style type="text/css">.'+hideClass+'{display: none !important}</style>');
+                }
 
-				$toTranslate.each(function(){
-					var $this = $(this),
-						translateAttr = $this.attr(attributeName);
+                $toTranslate.each(function(){
+                    var $this = $(this),
+                        translateAttr = $this.attr(attributeName);
 
-					if(translateAttr){
+                    if(translateAttr){
 
-						// Check if we are setting an attribute: my.translate.key
-						var keyData = translateAttr.split(':');
+                        // Check if we are setting an attribute: my.translate.key
+                        var keyData = translateAttr.split(':');
 
-						// If there is a translateAttr, set it to translateTarget
-						var translateTarget = (keyData.length>1) ? keyData[0] : false;
+                        // If there is a translateAttr, set it to translateTarget
+                        var translateTarget = (keyData.length>1) ? keyData[0] : false;
 
-						// If there is a translateTarget, move over one index
-						var translateKey = translateTarget ? keyData[1] : keyData[0];
+                        // If there is a translateTarget, move over one index
+                        var translateKey = translateTarget ? keyData[1] : keyData[0];
 
-						// Make sure our translate key is valid
-						if(!translateKey || translateTarget == attributeName){
-							return;
-						} else {
-							translateKey = translateKey.trim();
-						}
+                        // Make sure our translate key is valid
+                        if(!translateKey || translateTarget == attributeName){
+                            return;
+                        } else {
+                            translateKey = translateKey.trim();
+                        }
 
-						// Fetch our translation
-						var translation = utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
+                        // Fetch our translation
+                        var translation = utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
 
-						if(translation){
+                        if(translation){
 
-							// Check if we need to inject data into our  translation
-							var translateVars = $this.attr('data-vars');
-							if(translateVars){
-								try{
-									translateVars = JSON.parse(translateVars);
-									translation = utils.injectVars(translation, translateVars);
-								} catch(e){
-									if(self.defaults.debug){
-										utils.log('Invalid JSON: ' + translateVars);
-									}
-								}
-							}
+                            // Check if we need to inject data into our  translation
+                            var translateVars = $this.attr('data-vars');
+                            if(translateVars){
+                                try{
+                                    translateVars = JSON.parse(translateVars);
+                                    translation = utils.injectVars(translation, translateVars);
+                                } catch(e){
+                                    if(self.defaults.debug){
+                                        utils.log('Invalid JSON: ' + translateVars);
+                                    }
+                                }
+                            }
 
-							// If we don't have a translation target, default to html
-							if( translateTarget === false || translateTarget == 'html' ){
-								$this.html(translation);
-							} else {
+                            // If we don't have a translation target, default to html
+                            if( translateTarget === false || translateTarget == 'html' ){
+                                $this.html(translation);
+                            } else {
 
-								// a translate target of "text" does not mean an attribute "text"
-								if(translateTarget == 'text' ){
-									$this.text(translation);
-								} else {
-									// Set our translated attribute
-									$this.attr(translateTarget, translation);
-								}
-							}
+                                // a translate target of "text" does not mean an attribute "text"
+                                if(translateTarget == 'text' ){
+                                    $this.text(translation);
+                                } else {
+                                    // Set our translated attribute
+                                    $this.attr(translateTarget, translation);
+                                }
+                            }
 
-							// Some browsers freak out with floated elements that have no "layout"
-							if(self.defaults.fixFloats){
+                            // Some browsers freak out with floated elements that have no "layout"
+                            if(self.defaults.fixFloats){
 
-								// Hide the element
-								$this.addClass(hideClass);
+                                // Hide the element
+                                $this.addClass(hideClass);
 
-								// Thread for new browser reflow
-								setTimeout(function(){
-									// Restore elements display
-									$this.removeClass(hideClass);
-								}, 0);
-							}
-						} else {
-							utils.log('Could not find translation for '+translateKey);
-						}
-					}
-				});
+                                // Thread for new browser reflow
+                                setTimeout(function(){
+                                    // Restore elements display
+                                    $this.removeClass(hideClass);
+                                }, 0);
+                            }
+                        } else {
+                            utils.log('Could not find translation for '+translateKey);
+                        }
+                    }
+                });
 
-				// Trigger our translated event on our element or the document
-				($el || $(d)).trigger('translated');
-			}
-		};
+                // Trigger our translated event on our element or the document
+                ($el || $(d)).trigger('translated');
+            }
+        };
 
-		init = {
+        init = {
 
-			/**
-			 * Client side initializer
-			 * @param  {Object|String}  Hash of locale strings to set
-			 * @param  {Object} opts    Lingual.js options
-			 * @return {null}
-			 */
-			client: function(locales, opts){
+            /**
+             * Client side initializer
+             * @param  {Object|String}  Hash of locale strings to set
+             * @param  {Object} opts    Lingual.js options
+             * @return {null}
+             */
+            client: function(locales, opts){
 
-				// Extend our options
-				self.defaults = $.extend(self.defaults, opts);
-				cache.html = $('html');
+                // Extend our options
+                self.defaults = $.extend(self.defaults, opts);
+                cache.html = $('html');
 
-				// Set our current language
-				var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
-				utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || detected || 'en' );
+                // Set our current language
+                var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
+                utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || detected || 'en' );
 
-				// Set locales
-				if(typeof locales === "string" ){
+                // Set locales
+                if(typeof locales === "string" ){
 
-					// Check if we have cached data. If so, use it
-					if( self.defaults.cache && utils.cache.supported() ){
-						var cached = utils.cache.get(localeLocation);
-						if( cached ){
-							return init.finish( cached );
-						}
-					}
+                    // Check if we have cached data. If so, use it
+                    if( self.defaults.cache && utils.cache.supported() ){
+                        var cached = utils.cache.get(localeLocation);
+                        if( cached ){
+                            return init.finish( cached );
+                        }
+                    }
 
-					$.getJSON( locales , function(locales){
+                    $.getJSON( locales , function(locales){
 
-						// Set cache data
-						if( self.defaults.cache && utils.cache.supported() ){
-							utils.cache.set(localeLocation, locales);
-						}
-						init.finish( locales );
-					});
-					return;
-				}
-				init.finish(locales);
-			},
+                        // Set cache data
+                        if( self.defaults.cache && utils.cache.supported() ){
+                            utils.cache.set(localeLocation, locales);
+                        }
+                        init.finish( locales );
+                    });
+                    return;
+                }
+                init.finish(locales);
+            },
 
-			/**
-			 * Server side initializer
-			 * @param  {Object} locales Hash of locale strings to set
-			 * @param  {Object} opts    Lingual.js options
-			 * @return {null}
-			 */
-			server: function(locales, opts){
+            /**
+             * Server side initializer
+             * @param  {Object} locales Hash of locale strings to set
+             * @param  {Object} opts    Lingual.js options
+             * @return {null}
+             */
+            server: function(locales, opts){
 
-				// Extend our options
-				var extend = require('node.extend');
-				self.defaults = extend(self.defaults, opts);
+                // Extend our options
+                var extend = require('node.extend');
+                self.defaults = extend(self.defaults, opts);
 
-				// Set our current language
-				utils.initLanguage();
+                // Set our current language
+                utils.initLanguage();
 
-				// Set locales
-				init.finish(locales);
+                // Set locales
+                init.finish(locales);
 
-			},
+            },
 
-			/**
-			 * Finishes setting locales once they have been downloaded
-			 * @param  {Object} locales The hash of locales to be set for use
-			 * @return {null}
-			 */
-			finish: function(locales){
+            /**
+             * Finishes setting locales once they have been downloaded
+             * @param  {Object} locales The hash of locales to be set for use
+             * @return {null}
+             */
+            finish: function(locales){
 
-				// Make sure our language exists, elsewise default to "en"
-				if(!locales[self.defaults.lang]){
-					utils.log('Locales "'+self.defaults.lang+'" do not exist, falling back to "'+self.defaults.fallbackLang+'"');
-					utils.setLang(self.defaults.fallbackLang);
-				}
+                // Make sure our language exists, elsewise default to "en"
+                if(!locales[self.defaults.lang]){
+                    utils.log('Locales "'+self.defaults.lang+'" do not exist, falling back to "'+self.defaults.fallbackLang+'"');
+                    utils.setLang(self.defaults.fallbackLang);
+                }
 
-				// Set locales
-				utils.setLocales( locales );
+                // Set locales
+                utils.setLocales( locales );
 
-				// If we're on the client, translate automatically
-				utils.client(function(){
-					action.translate();
-				});
+                // If we're on the client, translate automatically
+                utils.client(function(){
+                    action.translate();
+                });
 
-				cache.finish = new Date().getTime();
-			}
-		};
+                cache.finish = new Date().getTime();
+            }
+        };
 
-		/**
-		 * Sets the language
-		 * @param  {String} locale The language key to set to
-		 * @return {null}
-		 */
-		self.locale = function(locale){
-			if(typeof locale == 'undefined'){
-				return self.defaults.lang;
-			}
-			if( typeof cache.localeStrings[locale] !== "undefined" ){
-				self.defaults.lang = locale;
-			}
-		};
+        /**
+         * Sets the language
+         * @param  {String} locale The language key to set to
+         * @return {null}
+         */
+        self.locale = function(locale){
+            if(typeof locale == 'undefined'){
+                return self.defaults.lang;
+            }
+            if( typeof cache.localeStrings[locale] !== "undefined" ){
+                self.defaults.lang = locale;
+            }
+        };
 
-		/**
-		 * Translates all elements on the page
-		 * @return {null}
-		 */
-		self.translate = function($el){
-			utils.client(function(){
-				action.translate($el);
-			});
-		};
+        /**
+         * Translates all elements on the page
+         * @return {null}
+         */
+        self.translate = function($el){
+            utils.client(function(){
+                action.translate($el);
+            });
+        };
 
-		/**
-		 * Translates the specified key
-		 * @param  {String} key  The languages text key in your locale hash
-		 * @param  {Object} vars A hash of the variables you want replaced within the text
-		 * @return {String} The translated text
-		 */
-		self.gettext = function(key, vars){
-			return utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars);
-		};
+        /**
+         * Translates the specified key
+         * @param  {String} key  The languages text key in your locale hash
+         * @param  {Object} vars A hash of the variables you want replaced within the text
+         * @return {String} The translated text
+         */
+        self.gettext = function(key, vars){
+            return utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars);
+        };
 
-		cache.start = new Date().getTime();
+        cache.start = new Date().getTime();
 
-		// Initialize shit
-		if( IsServer ){
-			init.server(locales, opts);
-		} else {
-			init.client(locales, opts);
-		}
-	};
+        // Initialize shit
+        if( IsServer ){
+            init.server(locales, opts);
+        } else {
+            init.client(locales, opts);
+        }
+    };
 
-	// Assign Lingual to the global namespace
-	if (IsServer) {
-		module.exports = App;
-	} else {
-		this[Namespace] = App;
-	}
+    // Assign Lingual to the global namespace
+    if (IsServer) {
+        module.exports = App;
+    } else {
+        this[Namespace] = App;
+    }
 
 }).apply(this, (typeof document !== "undefined") ? [window, document, navigator, jQuery] : [] );
