@@ -161,6 +161,11 @@
 					attributeName = 'data-'+selectorKey,
 					$toTranslate = $('['+attributeName+']', $el);
 
+				if(self.defaults.fixFloats){
+					var hideClass = Namespace+'-hide';
+					$('head').append('<style type="text/css">.'+hideClass+'{display: none !important}</style>');
+				}
+
 				$toTranslate.each(function(){
 					var $this = $(this),
 						translateAttr = $this.attr(attributeName);
@@ -218,27 +223,13 @@
 							// Some browsers freak out with floated elements that have no "layout"
 							if(self.defaults.fixFloats){
 
-								// Save our display state
-								var display = $this.css('display');
-
 								// Hide the element
-								$this.css('display', 'none');
+								$this.addClass(hideClass);
 
 								// Thread for new browser reflow
 								setTimeout(function(){
-
-									// *Reset* to default display
-									$this.css('display', '');
-
-									// If the display is different, that means the elements display style was set inline, so restore
-									if($this.css('display') !== display) {
-										$this.css('display', display);
-									} else
-
-									// If our style attribute is empty, remove it
-									if($this.attr('style') === ''){
-										$this.removeAttr('style');
-									}
+									// Restore elements display
+									$this.removeClass(hideClass);
 								}, 0);
 							}
 						} else {
