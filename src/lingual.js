@@ -5,7 +5,7 @@
     var Namespace = 'Lingual';
     var IsServer = (typeof module !== 'undefined' && module.exports);
 
-    var App = App || function(locales, opts) {
+    var App = App || function(locales, opts, cb) {
 
         var self = this,
             cache,
@@ -325,6 +325,10 @@
                 utils.client(function(){
                     action.translate();
                 });
+
+                if( typeof cb == "function" ){
+                    cb.call(self);
+                }
 
                 cache.finish = new Date().getTime();
             }
