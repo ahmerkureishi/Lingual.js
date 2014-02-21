@@ -25,6 +25,7 @@
         };
 
         cache = {
+            initialized: false,
             localeStrings: {}
         };
 
@@ -326,11 +327,13 @@
                     action.translate();
                 });
 
+
+                cache.initialized = true;
+                cache.finish = new Date().getTime();
+
                 if( typeof cb == "function" ){
                     cb.call(self);
                 }
-
-                cache.finish = new Date().getTime();
             }
         };
 
@@ -365,7 +368,7 @@
          * @return {String} The translated text
          */
         self.gettext = function(key, vars){
-            return utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars);
+            return cache.initialized ? utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars) : undefined;
         };
 
         cache.start = new Date().getTime();
