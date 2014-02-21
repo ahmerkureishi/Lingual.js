@@ -401,7 +401,7 @@
                         if( Object.keys && Object.keys(locales).length ){
                             var lastFallbackLang = Object.keys(locales)[0];
 
-                            utils.log('Locales "'+self.defaults.fallbackLang+'" do not exist, falling back to "'+lastFallbackLang+'"');
+                            utils.log('Falling back to "'+lastFallbackLang+'"');
 
                             utils.setLang(lastFallbackLang);
 
