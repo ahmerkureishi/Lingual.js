@@ -21,6 +21,7 @@
             cache: false,
             fixFloats: true,
             variants: false,
+            allowFallbackTranslations: true,
             debug: true
         };
 
@@ -108,8 +109,13 @@
              * Sets up our default language based off of various conditions
              * @return {null}
              */
-            initLanguage: function(lang){
+            initLang: function(lang){
                 utils.setLang( lang || self.defaults.lang );
+            },
+
+            detectLang: function(){
+                var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
+                return self.defaults.lang || cache.html.attr('lang') || detected || 'en';
             },
 
             /**
@@ -129,6 +135,73 @@
              */
             setLocales: function(localeStrings){
                 cache.localeStrings = localeStrings;
+            },
+
+            /**
+             * Gets translations to be used
+             * @return {String}
+             */
+            getLocales: function(){
+                return cache.localeStrings;
+            },
+
+            loader: {
+
+                /**
+                 * Begins the loading routine for json data
+                 * @param  {String|Array} locales  The urls of the locales to load
+                 * @param  {Function} complete Callback when all locales have been loaded
+                 * @return {null}
+                 */
+                routine: function(locales, complete){
+
+                    // Set locales
+                    if(typeof locales === "string" ){
+                        utils.loader.fetch(locales, function(localeData){
+                            complete(localeData);
+                        });
+                    } else if( $.isArray(locales) ){
+                        var len = locales.length;
+                        var loaded = 0;
+                        var finalLocaleData = {};
+
+                        $(locales).each(function(){
+                            utils.loader.fetch(this, function(localeData){
+                                finalLocaleData = $.extend(true, finalLocaleData, localeData);
+                                loaded++;
+                                if(loaded == len){
+                                    complete(finalLocaleData);
+                                }
+                            });
+                        });
+
+                    }
+                },
+
+                /**
+                 * Fetch the given data
+                 * @param  {String}   url The url of the data to retrieve
+                 * @param  {Function} cb  The callback once data has been fetched
+                 */
+                fetch: function(url, cb){
+
+                    // Check if we have cached data. If so, use it
+                    if( self.defaults.cache && utils.cache.supported() ){
+                        var cached = utils.cache.get(url);
+                        if( cached ){
+                            return cb( cached );
+                        }
+                    }
+
+                    return $.getJSON( url , function(locales){
+
+                        // Set cache data
+                        if( self.defaults.cache && utils.cache.supported() ){
+                            utils.cache.set(url, locales);
+                        }
+                        cb( locales );
+                    });
+                },
             },
 
             /**
@@ -160,11 +233,18 @@
                 // Gather our elements
                 var selectorKey = self.defaults.selectorKey,
                     attributeName = 'data-'+selectorKey,
-                    $toTranslate = $('['+attributeName+']', $el);
+                    $toTranslate = $('['+attributeName+']', $el),
+                    resetTranslation = false;
 
                 if(self.defaults.fixFloats){
                     var hideClass = Namespace+'-hide';
                     $('head').append('<style type="text/css">.'+hideClass+'{display: none !important}</style>');
+                }
+
+                // Do we need to reset our translations?
+                if(cache.reset){
+                    cache.reset = false;
+                    resetTranslation = '';
                 }
 
                 $toTranslate.each(function(){
@@ -190,9 +270,20 @@
                         }
 
                         // Fetch our translation
-                        var translation = utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
+                        var translation = resetTranslation!==false ? resetTranslation : utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
 
-                        if(translation){
+                        // Check if we have a fallback translation for the specified translateKey
+                        if(translation===false && resetTranslation===false && self.defaults.allowFallbackTranslations){
+                            if( self.defaults.fallbackLang in cache.localeStrings ){
+                                var fallbackTranslation = utils.parsePath( cache.localeStrings[self.defaults.fallbackLang], translateKey );
+                                if( fallbackTranslation ){
+                                    utils.log("Fallback translation for "+translateKey+" exists");
+                                    translation = fallbackTranslation;
+                                }
+                            }
+                        }
+
+                        if(translation!==false){
 
                             // Check if we need to inject data into our  translation
                             var translateVars = $this.attr('data-vars');
@@ -259,31 +350,11 @@
                 cache.html = $('html');
 
                 // Set our current language
-                var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
-                utils.initLanguage( self.defaults.lang || cache.html.attr('lang') || detected || 'en' );
+                utils.initLang( utils.detectLang() );
 
-                // Set locales
-                if(typeof locales === "string" ){
-
-                    // Check if we have cached data. If so, use it
-                    if( self.defaults.cache && utils.cache.supported() ){
-                        var cached = utils.cache.get(localeLocation);
-                        if( cached ){
-                            return init.finish( cached );
-                        }
-                    }
-
-                    $.getJSON( locales , function(locales){
-
-                        // Set cache data
-                        if( self.defaults.cache && utils.cache.supported() ){
-                            utils.cache.set(localeLocation, locales);
-                        }
-                        init.finish( locales );
-                    });
-                    return;
-                }
-                init.finish(locales);
+                utils.loader.routine(locales, function(localeData){
+                    init.finish(localeData);
+                });
             },
 
             /**
@@ -299,7 +370,7 @@
                 self.defaults = extend(self.defaults, opts);
 
                 // Set our current language
-                utils.initLanguage();
+                utils.initLang();
 
                 // Set locales
                 init.finish(locales);
@@ -315,8 +386,30 @@
 
                 // Make sure our language exists, elsewise default to "en"
                 if(!locales[self.defaults.lang]){
-                    utils.log('Locales "'+self.defaults.lang+'" do not exist, falling back to "'+self.defaults.fallbackLang+'"');
-                    utils.setLang(self.defaults.fallbackLang);
+
+                    utils.log('Locales "'+self.defaults.lang+'" do not exist');
+
+                    // Does our fallback even exist?
+                    if( locales[self.defaults.fallbackLang] && (self.defaults.fallbackLang !== self.defaults.lang) ){
+
+                        utils.log('Falling back to "'+self.defaults.fallbackLang+'"');
+                        utils.setLang(self.defaults.fallbackLang);
+
+                    } else {
+
+                        // Try and fallback to anything available
+                        if( Object.keys && Object.keys(locales).length ){
+                            var lastFallbackLang = Object.keys(locales)[0];
+
+                            utils.log('Locales "'+self.defaults.fallbackLang+'" do not exist, falling back to "'+lastFallbackLang+'"');
+
+                            utils.setLang(lastFallbackLang);
+
+
+                        } else {
+                            utils.log('Invalid Locale File');
+                        }
+                    }
                 }
 
                 // Set locales
@@ -327,7 +420,7 @@
                     action.translate();
                 });
 
-
+                // Set some initialized variables
                 cache.initialized = true;
                 cache.finish = new Date().getTime();
 
@@ -352,6 +445,35 @@
         };
 
         /**
+         * Adds more locales to the working translations
+         * @param {[type]} locales [description]
+         */
+        self.addLocales = function(locales){
+            utils.loader.routine(locales, function(localeData){
+                utils.setLocales( $.extend(true, utils.getLocales(), localeData) );
+                self.translate();
+            });
+        };
+
+        /**
+         * Returns the locale data currently being used
+         * @return {Object} The locales being used
+         */
+        self.data = function(){
+            return utils.getLocales();
+        };
+
+        /**
+         * Reset the language and the translations
+         * @return {null}
+         */
+        self.reset = function(){
+            cache.reset = true;
+            utils.setLang( utils.detectLang() );
+            self.translate();
+        };
+
+        /**
          * Translates all elements on the page
          * @return {null}
          */
@@ -371,6 +493,7 @@
             return cache.initialized ? utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars) : undefined;
         };
 
+        // Set some performance variables
         cache.start = new Date().getTime();
 
         // Initialize shit

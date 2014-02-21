@@ -62,7 +62,6 @@
             $(document).ready(function(){
 
                 var translator = new Lingual('locales/locales.json');
-                console.log(translator.gettext('test.deep.welcome'));
 
                 $(document).on('click', '#add', function(){
                     $('#append').append( $('<div class="margin"><span class="highlight" data-translate="test.deep.dynamic" data-vars=\''+( JSON.stringify({name: $('#name').val() }) )+'\'></span></div>') );

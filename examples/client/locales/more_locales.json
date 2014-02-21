@@ -1,0 +1,23 @@
+{
+    "en": {
+        "test": {
+            "deep": {
+                "more": "This is text loaded from another locale file!"
+            }
+        }
+    },
+    "es": {
+        "test": {
+            "deep": {
+                "more": "Este es un texto cargado de otro archivo locale!"
+            }
+        }
+    },
+    "de": {
+        "test": {
+            "deep": {
+                "more": "Dies ist ein Text aus einem anderen Gebietsschema-Datei geladen!"
+            }
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+	"en": {
+		"foo": "bar",
+		"hello": "world",
+		"say-hi": "Hello, :name!",
+		"fallback-test": "I only exist in English"
+	},
+
+	"caps": {
+		"foo": "BAR",
+		"hello": "WORLD"
+	}
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lingual.js Tests</title>
+        <link rel="stylesheet" type="text/css" href="http://thundercats.makerstudios.com/code/latest/tc.css">
+        <link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css">
+        <style type="text/css">
+            .logo{margin:60px 0 0 60px}.maker{margin-top:60px}
+            .progress{ position: auto; background: none; height: auto; width: auto; }
+        </style>
+    </head>
+    <body>
+
+        <a href="https://github.com/MakerStudios/Lingual.js" class="btn btn-border logo"> Lingual.js </a>
+        <a href="http://makerstudios.com" class="btn btn-border maker btn-black"> Maker Studios </a>
+
+        <div id="mocha"></div>
+
+        <div id="sandbox" style="visibility: hidden">
+
+            <div id="t-1" data-translate="foo"></div>
+            <div id="t-2" data-translate="hello"></div>
+
+            <div id="t-3" data-translate="sample"></div>
+            <div id="t-4" data-translate="test"></div>
+
+            <input id="t-5" type="text" data-translate="placeholder: foo">
+            <input id="t-6" type="button" data-translate="value: hello" class="btn">
+
+            <div id="t-7" data-translate="fallback-test"></div>
+
+        </div>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="../src/lingual.js"></script>
+        <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/chai/chai.js"></script>
+        <script>
+            mocha.ui('bdd');
+            var assert = chai.assert;
+            var expect = chai.expect;
+            var should = chai.should();
+        </script>
+        <script src="tests.js"></script>
+        <script>
+            $(document).ready(function(){
+                (window.mochaPhantomJS) ? mochaPhantomJS.run() : mocha.run();
+            });
+        </script>
+    </body>
+</html>
