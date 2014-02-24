@@ -448,10 +448,13 @@
          * Adds more locales to the working translations
          * @param {[type]} locales [description]
          */
-        self.addLocales = function(locales){
+        self.addLocales = function(locales, cb){
             utils.loader.routine(locales, function(localeData){
                 utils.setLocales( $.extend(true, utils.getLocales(), localeData) );
                 self.translate();
+                if(typeof cb =="function"){
+                    cb();
+                }
             });
         };
 
