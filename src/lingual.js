@@ -22,7 +22,7 @@
             fixFloats: true,
             variants: false,
             allowFallbackTranslations: true,
-            debug: true
+            logging: true
         };
 
         cache = {
@@ -38,7 +38,7 @@
              * @return {null}
              */
             log: function(what){
-                if(self.defaults.debug){
+                if(self.defaults.logging){
                     console.log(what);
                 }
             },
@@ -461,6 +461,21 @@
          */
         self.data = function(){
             return utils.getLocales();
+        };
+
+        /**
+         * Toggles the visibility of elements that were translated through the data API
+         * @return {null}
+         */
+        self.debug = function(){
+            var debug = Namespace+'-debug';
+            if( cache.debugging ){
+                cache.debugging = false;
+                $('#'+debug).remove();
+            } else {
+                cache.debugging = true;
+                $('head').append('<style type="text/css" id="'+debug+'">[data-'+self.defaults.selectorKey+'], .'+debug+'{outline: 1px solid red;}</style>');
+            }
         };
 
         /**
