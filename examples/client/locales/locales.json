@@ -4,7 +4,8 @@
             "deep": {
                 "welcome": "Welcome to our Site",
                 "title": "Lingual.js Demo",
-                "dynamic": "Good day, :name!"
+                "dynamic": "Good day, :name!",
+                "fallback": "This is a fallbadk!"
             }
         }
     },

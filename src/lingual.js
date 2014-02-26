@@ -204,21 +204,52 @@
                 },
             },
 
-            /**
-             * Replaces named variables in a string with their respective values
-             * @param  {String} str  The string to replace text within
-             * @param  {Object} args The values to inject into the string
-             * @return {String}      The updated string
-             */
-            injectVars: function(str, args) {
-                args = args || {};
-                var key;
-                for(key in args){
-                    if(args.hasOwnProperty(key)){
-                        str = str.replace(':'+key, args[key]);
+            translate: {
+
+                /**
+                 * Replaces named variables in a string with their respective values
+                 * @param  {String} str  The string to replace text within
+                 * @param  {Object} args The values to inject into the string
+                 * @return {String}      The updated string
+                 */
+                inject: function(str, args) {
+                    args = args || {};
+                    var key;
+                    for(key in args){
+                        if(args.hasOwnProperty(key)){
+                            str = str.replace(':'+key, args[key]);
+                        }
                     }
+                    return str;
+                },
+
+                /**
+                 * Retrieves the string to use for a given translateKey
+                 * @param  {String} translateKey     The path in your json file to the desired translation
+                 * @param  {String|Boolean} resetTranslation False by defailt, if set to a string (any string), it will override the json string.
+                 * @return {[type]}                  [description]
+                 */
+                fetch: function(translateKey, resetTranslation){
+
+                    resetTranslation = ( typeof(resetTranslation) == 'undefined' ) ? false : resetTranslation;
+
+                    var translation = (resetTranslation !== false) ? resetTranslation : utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
+
+                    // Check if we have a fallback translation for the specified translateKey
+                    if(translation === false && resetTranslation === false && self.defaults.allowFallbackTranslations){
+
+                        // No fallback exists
+                        if( !(self.defaults.fallbackLang in cache.localeStrings) ){
+                            return translation;
+                        }
+                        var fallbackTranslation = utils.parsePath( cache.localeStrings[self.defaults.fallbackLang], translateKey );
+                        if( fallbackTranslation ){
+                            utils.log("Fallback translation for "+translateKey+" exists");
+                            translation = fallbackTranslation;
+                        }
+                    }
+                    return translation;
                 }
-                return str;
             }
         };
 
@@ -270,18 +301,7 @@
                         }
 
                         // Fetch our translation
-                        var translation = resetTranslation!==false ? resetTranslation : utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
-
-                        // Check if we have a fallback translation for the specified translateKey
-                        if(translation===false && resetTranslation===false && self.defaults.allowFallbackTranslations){
-                            if( self.defaults.fallbackLang in cache.localeStrings ){
-                                var fallbackTranslation = utils.parsePath( cache.localeStrings[self.defaults.fallbackLang], translateKey );
-                                if( fallbackTranslation ){
-                                    utils.log("Fallback translation for "+translateKey+" exists");
-                                    translation = fallbackTranslation;
-                                }
-                            }
-                        }
+                        var translation = utils.translate.fetch(translateKey, resetTranslation);
 
                         if(translation!==false){
 
@@ -290,7 +310,7 @@
                             if(translateVars){
                                 try{
                                     translateVars = JSON.parse(translateVars);
-                                    translation = utils.injectVars(translation, translateVars);
+                                    translation = utils.translate.inject(translation, translateVars);
                                 } catch(e){
                                     if(self.defaults.debug){
                                         utils.log('Invalid JSON: ' + translateVars);
@@ -442,6 +462,7 @@
             if( typeof cache.localeStrings[locale] !== "undefined" ){
                 self.defaults.lang = locale;
             }
+            return self;
         };
 
         /**
@@ -479,6 +500,7 @@
                 cache.debugging = true;
                 $('head').append('<style type="text/css" id="'+debug+'">[data-'+self.defaults.selectorKey+'], .'+debug+'{outline: 1px solid red;}</style>');
             }
+            return self;
         };
 
         /**
@@ -489,6 +511,7 @@
             cache.reset = true;
             utils.setLang( utils.detectLang() );
             self.translate();
+            return self;
         };
 
         /**
@@ -499,16 +522,20 @@
             utils.client(function(){
                 action.translate($el);
             });
+            return self;
         };
 
         /**
          * Translates the specified key
-         * @param  {String} key  The languages text key in your locale hash
+         * @param  {String} translateKey  The languages text key in your locale hash
          * @param  {Object} vars A hash of the variables you want replaced within the text
          * @return {String} The translated text
          */
-        self.gettext = function(key, vars){
-            return cache.initialized ? utils.injectVars(utils.parsePath(cache.localeStrings[self.defaults.lang], key), vars) : undefined;
+        self.gettext = function(translateKey, vars){
+
+            // Fetch our translation
+            var translation = utils.translate.fetch(translateKey);
+            return cache.initialized ? utils.translate.inject(translation, vars) : undefined;
         };
 
         // Set some performance variables
