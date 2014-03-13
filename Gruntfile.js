@@ -15,7 +15,7 @@ module.exports = function(grunt) {
             },
             main: {
                 files: {
-                    'dist/lingual.min.js': ['dist/lingual.js']
+                    'dist/lingual.min.js': ['dist/lingual.min.js']
                 }
             }
         },
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
                     'src/lingual.js',
                     'src/lingual.ko.js',
                 ],
-                dest: 'dist/lingual.js'
+                dest: 'dist/lingual.min.js'
             }
         },
     });
