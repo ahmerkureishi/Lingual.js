@@ -12,6 +12,7 @@
 		"grunt-contrib-watch": "~0.5.3",
 		"grunt-contrib-uglify": "0.2.5",
 		"grunt-contrib-jshint": "0.8.0",
+    	"grunt-contrib-concat": "~0.3.0",
 		"node.extend": "1.0.9",
 		"mocha": "*",
 	    "chai": "*",

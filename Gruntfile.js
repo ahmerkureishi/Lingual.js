@@ -15,7 +15,7 @@ module.exports = function(grunt) {
             },
             main: {
                 files: {
-                    'dist/lingual.min.js': ['src/lingual.js']
+                    'dist/lingual.min.js': ['dist/lingual.js']
                 }
             }
         },
@@ -26,17 +26,28 @@ module.exports = function(grunt) {
 
         watch: {
             scripts: {
-                files: 'src/lingual.js',
-                tasks: ['default']
+                files: 'src/*.js',
+                tasks: ['jshint', 'concat', 'uglify']
             }
-        }
+        },
+
+        concat: {
+            dist: {
+                src: [
+                    'src/lingual.js',
+                    'src/lingual.ko.js',
+                ],
+                dest: 'dist/lingual.js'
+            }
+        },
     });
 
     grunt.loadTasks('tasks');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
-    grunt.registerTask('default', ['jshint', 'uglify']);
-    grunt.registerTask('develop', ['jshint', 'uglify', 'watch']);
+    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('develop', ['jshint', 'concat', 'uglify', 'watch']);
 };
