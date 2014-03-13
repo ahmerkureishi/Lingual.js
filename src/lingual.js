@@ -1,4 +1,4 @@
-(function (w, d, nav, $) {
+(function (w, d, nav, $, ko) {
 
     "use strict";
 
@@ -538,6 +538,26 @@
             return cache.initialized ? utils.translate.inject(translation, vars) : undefined;
         };
 
+
+        /**
+         * Translates the specified element through Knockout
+         * @param  {Object} element         The element to translate
+         * @param  {Function} valueAccessor The value accessor to unwrap our observable
+         */
+        self.koTranslateElement = function(element, valueAccessor){
+            var $el = $(element);
+            var val = valueAccessor();
+
+            // The user specified a translate key, translate this element only
+            if(val){
+                $el.attr('data-' + self.defaults.selectorKey, valueAccessor());
+                self.translate( $el.parent() );
+            } else {
+                // Translate all the kidz
+                self.translate( $el );
+            }
+        };
+
         // Set some performance variables
         cache.start = new Date().getTime();
 
@@ -545,7 +565,18 @@
         if( IsServer ){
             init.server(locales, opts);
         } else {
+
             init.client(locales, opts);
+
+            // If knockout exists, add a custom binding
+            if(ko && ko.bindingHandlers){
+                ko.bindingHandlers[self.defaults.selectorKey] = {
+                    init: self.koTranslateElement,
+                    preprocess: function(val) {
+                        return val || 'false';
+                    }
+                };
+            }
         }
     };
 
@@ -556,4 +587,4 @@
         this[Namespace] = App;
     }
 
-}).apply(this, (typeof document !== "undefined") ? [window, document, navigator, jQuery] : [] );
+}).apply(this, (typeof document !== "undefined") ? [window, document, navigator, jQuery, ko] : [] );
