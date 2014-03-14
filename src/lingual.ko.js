@@ -28,4 +28,4 @@
         };
     });
 
-})(Lingual, ko);
+}).call(this, Lingual, typeof ko !== 'undefined' ? ko : null);
