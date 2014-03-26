@@ -3,6 +3,17 @@ Lingual.js
 
 Crazy simple client & server side localisation
 
+------------
+
+Lingual.js is a small library that makes it a breeze to bind translations to a page. It is focused on being a powerful data API driven library that leverages a store of translations from a json file to inject into the page.
+
+## Features
+* Fast
+* Lightweight
+* Language detection
+* Extensible
+* Optional Knockout bindings
+* Events
 
 ## Installation
 
@@ -54,7 +65,7 @@ var locales = require('path/to/locale.json');
 new Lingual(locales, settings);
 ```
 
-### Default Settings
+## Default Settings
 ```javascript
 var settings = {
     lang: '',
@@ -75,7 +86,7 @@ var settings = {
 
 Pass an object literal as the second parameter of the constructor method to set the settings to use for the instantiated object.
 
-### Setting the Language
+## Setting the Language
 
 There are various ways to set the language to be used with Lingual.js, and there are fallbacks to setting the language. The order is as follows:
 
@@ -84,7 +95,7 @@ There are various ways to set the language to be used with Lingual.js, and there
 * The `navigator.language` property will be used if the `lang` attribute on `html` is not set.
 * If the three methods fail above, the language will default to 'en'
 
-### Translating
+## Translating
 
 Lingual.js aims to be as simple as possible. The main method of translating strings is via the `data-translate` attribute on HTML elements.
 
@@ -110,7 +121,7 @@ You can specify certain attributes to be translated
 
 This will look deeper within the object, allowing you to organize your translations. You can change the delimiter used by settings `pathDelimiter` in the settings object.
 
-### Using dynamic variables
+## Using dynamic variables
 
 You can pass dynamic data to the strings to be interpolated. Currently, the only type of data replacement supported is with an object literal.
 

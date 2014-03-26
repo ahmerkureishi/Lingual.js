@@ -31,7 +31,7 @@ module.exports = function(grunt) {
                 tasks: ['jshint', 'uglify']
             },
             docs: {
-                files: ['README.md', 'docs/template.html'],
+                files: ['README.md', 'docs/_template.html'],
                 tasks: ['markdown']
             }
         },

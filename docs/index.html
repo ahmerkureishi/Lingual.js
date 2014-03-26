@@ -6,8 +6,19 @@
         <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link href="http://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
         <style type="text/css">
+            ::selection {
+                background: #000;
+                color: #FFF;
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+            }
+            *{
+                text-rendering: optimizeLegibility;
+                -webkit-font-smoothing:antialiased;
+            }
             body{
                 font-family: 'PT Serif', serif;
+                background: #fefefe;
+                color: #1a1a1a;
             }
             .auto{
                 margin: 0 auto;
@@ -35,6 +46,17 @@
                 <div class="col-md-8 col-lg-8 col-sm-10 col-xs-12 auto">
                     <h1 id="lingual-js">Lingual.js</h1>
 <p>Crazy simple client &amp; server side localisation</p>
+<hr>
+<p>Lingual.js is a small library that makes it a breeze to bind translations to a page. It is focused on being a powerful data API driven library that leverages a store of translations from a json file to inject into the page.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Fast</li>
+<li>Lightweight</li>
+<li>Language detection</li>
+<li>Extensible</li>
+<li>Optional Knockout bindings</li>
+<li>Events</li>
+</ul>
 <h2 id="installation">Installation</h2>
 <p>Include lingual.js in the head of your document or directly below the closing body tag. jQuery is a requirement.</p>
 <pre><code class="lang-html">&lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
@@ -60,7 +82,7 @@
 var locales = require(&#39;path/to/locale.json&#39;);
 
 new Lingual(locales, settings);</code></pre>
-<h3 id="default-settings">Default Settings</h3>
+<h2 id="default-settings">Default Settings</h2>
 <pre><code class="lang-javascript">var settings = {
     lang: &#39;&#39;,
     pathDelimiter: &#39;.&#39;,
@@ -78,7 +100,7 @@ new Lingual(locales, settings);</code></pre>
 <li><code>debug</code>: Boolean, If true, logging for the specified localiser will be active</li>
 </ul>
 <p>Pass an object literal as the second parameter of the constructor method to set the settings to use for the instantiated object.</p>
-<h3 id="setting-the-language">Setting the Language</h3>
+<h2 id="setting-the-language">Setting the Language</h2>
 <p>There are various ways to set the language to be used with Lingual.js, and there are fallbacks to setting the language. The order is as follows:</p>
 <ul>
 <li>The <code>settings.lang</code> value will be used first (if specified)</li>
@@ -86,7 +108,7 @@ new Lingual(locales, settings);</code></pre>
 <li>The <code>navigator.language</code> property will be used if the <code>lang</code> attribute on <code>html</code> is not set.</li>
 <li>If the three methods fail above, the language will default to &#39;en&#39;</li>
 </ul>
-<h3 id="translating">Translating</h3>
+<h2 id="translating">Translating</h2>
 <p>Lingual.js aims to be as simple as possible. The main method of translating strings is via the <code>data-translate</code> attribute on HTML elements.</p>
 <pre><code class="lang-html">&lt;div data-translate=&quot;foo&quot;&gt;&lt;/div&gt;</code></pre>
 <p>This will look for the <code>foo</code> key within the locale object set earlier and set the div&#39;s contents to that string.</p>
@@ -99,7 +121,7 @@ new Lingual(locales, settings);</code></pre>
 &lt;!-- or --&gt;
 &lt;img data-translate=&quot;alt: my.image.caption&quot;&gt;</code></pre>
 <p>This will look deeper within the object, allowing you to organize your translations. You can change the delimiter used by settings <code>pathDelimiter</code> in the settings object.</p>
-<h3 id="using-dynamic-variables">Using dynamic variables</h3>
+<h2 id="using-dynamic-variables">Using dynamic variables</h2>
 <p>You can pass dynamic data to the strings to be interpolated. Currently, the only type of data replacement supported is with an object literal.</p>
 <pre><code class="lang-javascript">var translate = new Lingual({
     &quot;en&quot;: {
