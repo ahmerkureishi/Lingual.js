@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lingual.js</title>
+        <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link href="http://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+        <style type="text/css">
+            body{
+                font-family: 'PT Serif', serif;
+            }
+            .auto{
+                margin: 0 auto;
+                float: none;
+            }
+            .container{
+                margin-top: 50px;
+                margin-bottom: 50px;
+            }
+
+            h2{
+                border-top: 1px solid rgba(0,0,0,0.1);
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+                padding: 10px 0;
+                margin-top: 40px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <a href="https://github.com/MakerStudios/Lingual.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-lg-8 col-sm-10 col-xs-12 auto">
+                    <h1 id="lingual-js">Lingual.js</h1>
+<p>Crazy simple client &amp; server side localisation</p>
+<h2 id="installation">Installation</h2>
+<p>Include lingual.js in the head of your document or directly below the closing body tag. jQuery is a requirement.</p>
+<pre><code class="lang-html">&lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;dist/lingual.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+<p>If you want to use Lingual.js on the server, run <code>npm install</code>, then include like any node module:</p>
+<pre><code class="lang-javascript">var Lingual = require(&#39;Lingual.js&#39;);</code></pre>
+<h2 id="initializing">Initializing</h2>
+<p>Currently, there are three ways to initialize Lingual.js on the client. Initializing consists of setting the language to use and setting the dictionary/hash/object of strings to use for translation.</p>
+<h3 id="loading-translations">Loading translations</h3>
+<h5 id="using-ajax-to-load-specified-language">Using Ajax to load specified language</h5>
+<pre><code class="lang-javascript">new Lingual(&#39;path/to/translations_en.json&#39;, settings);</code></pre>
+<h5 id="using-ajax-to-load-language-dynamically">Using Ajax to load language dynamically</h5>
+<pre><code class="lang-javascript">new Lingual(&#39;path/to/translations_%LANG%.json&#39;, settings);</code></pre>
+<p><code>%LANG%</code> will dynamically be replaced by the language that is automatically detected.</p>
+<h5 id="including-translations-directly">Including translations directly</h5>
+<pre><code class="lang-javascript">new Lingual({
+    &quot;en&quot;: {
+        &quot;foo&quot;: &quot;bar&quot;
+    }
+}, settings);</code></pre>
+<p>Initializing Lingual on the server:</p>
+<pre><code class="lang-javascript">var Lingual = require(&#39;Lingual.js&#39;);
+var locales = require(&#39;path/to/locale.json&#39;);
+
+new Lingual(locales, settings);</code></pre>
+<h3 id="default-settings">Default Settings</h3>
+<pre><code class="lang-javascript">var settings = {
+    lang: &#39;&#39;,
+    pathDelimiter: &#39;.&#39;,
+    selectorKey: &#39;translate&#39;,
+    variants: false,
+    fixFloats: true,
+    debug: true
+};</code></pre>
+<ul>
+<li><code>lang</code>: String, The language key you want to set. (e.g. &quot;en&quot; or &quot;de&quot;). On the client, leave undefined to attempt to automatically detect.</li>
+<li><code>pathDelimiter</code>: String, The string to denote a key in your translation hash</li>
+<li><code>selectorKey</code>: String, The <code>data-attribute</code> name to use for translations: (e.g. &quot;data-translate&quot;)</li>
+<li><code>variants</code>: Boolean, If true, language variants will be used (e.g. &quot;en-US&quot; as opposed to &quot;en&quot;)</li>
+<li><code>fixFloats</code>: Boolean, Fixes a bug in some browsers that collapse a floated element and do not reflow when text has been injected</li>
+<li><code>debug</code>: Boolean, If true, logging for the specified localiser will be active</li>
+</ul>
+<p>Pass an object literal as the second parameter of the constructor method to set the settings to use for the instantiated object.</p>
+<h3 id="setting-the-language">Setting the Language</h3>
+<p>There are various ways to set the language to be used with Lingual.js, and there are fallbacks to setting the language. The order is as follows:</p>
+<ul>
+<li>The <code>settings.lang</code> value will be used first (if specified)</li>
+<li>The <code>lang</code> attribute on the <code>html</code> element will be checked next (e.g. <code>&lt;html lang=&quot;en&quot;&gt;</code>).</li>
+<li>The <code>navigator.language</code> property will be used if the <code>lang</code> attribute on <code>html</code> is not set.</li>
+<li>If the three methods fail above, the language will default to &#39;en&#39;</li>
+</ul>
+<h3 id="translating">Translating</h3>
+<p>Lingual.js aims to be as simple as possible. The main method of translating strings is via the <code>data-translate</code> attribute on HTML elements.</p>
+<pre><code class="lang-html">&lt;div data-translate=&quot;foo&quot;&gt;&lt;/div&gt;</code></pre>
+<p>This will look for the <code>foo</code> key within the locale object set earlier and set the div&#39;s contents to that string.</p>
+<p>You can use an infinite depth of keys to pull from. For example:</p>
+<pre><code class="lang-html">&lt;div data-translate=&quot;foo.subKey.something.else&quot;&gt;&lt;/div&gt;</code></pre>
+<p>You can specify certain attributes to be translated</p>
+<pre><code class="lang-html">&lt;input type=&quot;button&quot; data-translate=&quot;value: foo&quot;&gt;
+&lt;!-- or --&gt;
+&lt;input type=&quot;text&quot; data-translate=&quot;placeholder: foo&quot;&gt;
+&lt;!-- or --&gt;
+&lt;img data-translate=&quot;alt: my.image.caption&quot;&gt;</code></pre>
+<p>This will look deeper within the object, allowing you to organize your translations. You can change the delimiter used by settings <code>pathDelimiter</code> in the settings object.</p>
+<h3 id="using-dynamic-variables">Using dynamic variables</h3>
+<p>You can pass dynamic data to the strings to be interpolated. Currently, the only type of data replacement supported is with an object literal.</p>
+<pre><code class="lang-javascript">var translate = new Lingual({
+    &quot;en&quot;: {
+        &quot;foo&quot;: &quot;Hello, :name!&quot;
+    }
+});</code></pre>
+<pre><code class="lang-html">&lt;div data-translate=&quot;foo&quot; data-vars=&#39;{&quot;name&quot;: &quot;Jacob&quot;}&#39;&gt;&lt;/div&gt; &lt;!-- Produces &quot;Hello, Jacob!&quot; --&gt;</code></pre>
+<h2 id="public-methods">Public Methods</h2>
+<pre><code class="lang-javascript">var translator = new Lingual(/* locales, settings */);</code></pre>
+<h4 id="-locale-string-locale-"><code>locale(String locale)</code></h4>
+<p>Change the locale of the document. Must be a string that matches with a preexisting key in the json translations provided upon initialization.</p>
+<pre><code class="lang-javascript">translator.locale(&quot;es&quot;);</code></pre>
+<h4 id="-translate-element-"><code>translate($Element)</code></h4>
+<p>Translate all DOM elements to the set locale. If there is a jQuery object passed as a parameter, the translations will only occur within the scope of that object.</p>
+<pre><code class="lang-javascript">translator.translate();</code></pre>
+<h4 id="-gettext-string-key-mixed-vars-"><code>gettext(String key, Mixed vars)</code></h4>
+<p>Returns the translation for the specified key with an optional <code>vars</code> parameter being an Array or an Object Literal/Json.</p>
+<pre><code class="lang-javascript">translator.gettext(&quot;foo&quot;, [&quot;Vars&quot;]);</code></pre>
+<h2 id="main-differences-between-the-client-and-server-usages-">Main differences between the client and server usages:</h2>
+<p>The server side version of Lingual.js is the same as the client, minus the data attribute API and the <code>translate</code> method.</p>
+<h2 id="todo">Todo</h2>
+<ul>
+<li>Simplistic pluralization rules for most languages</li>
+</ul>
+<h2 id="licensing">Licensing</h2>
+<p>The MIT License (MIT)</p>
+<p>Copyright (c) 2014 Maker Studios</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+
+                </div>
+            </div>
+        </div>
+
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="../dist/lingual.min.js"></script>
+    </body>
+</html>

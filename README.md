@@ -6,10 +6,11 @@ Crazy simple client & server side localisation
 
 ## Installation
 
-Include lingual.js in the head of your document or directly below the closing body tag.
+Include lingual.js in the head of your document or directly below the closing body tag. jQuery is a requirement.
 
 ```html
-<script src="src/lingual.jquery.js"></script>
+<script src="jquery.js"></script>
+<script src="dist/lingual.min.js"></script>
 ```
 
 If you want to use Lingual.js on the server, run `npm install`, then include like any node module:

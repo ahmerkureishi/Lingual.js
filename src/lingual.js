@@ -22,7 +22,8 @@
             fixFloats: true,
             variants: false,
             allowFallbackTranslations: true,
-            logging: true
+            debug: false,
+            autoTranslate: true
         };
 
         cache = {
@@ -38,7 +39,7 @@
              * @return {null}
              */
             log: function(what){
-                if(self.defaults.logging){
+                if(self.defaults.debug){
                     console.log(what);
                 }
             },
@@ -113,6 +114,10 @@
                 utils.setLang( lang || self.defaults.lang );
             },
 
+            /**
+             * Attepmts to detect the users default language
+             * @return {String} The language the user is using (or 'en')
+             */
             detectLang: function(){
                 var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
                 return self.defaults.lang || cache.html.attr('lang') || detected || 'en';
@@ -436,9 +441,11 @@
                 utils.setLocales( locales );
 
                 // If we're on the client, translate automatically
-                utils.client(function(){
-                    action.translate();
-                });
+                if(self.defaults.autoTranslate){
+                    utils.client(function(){
+                        action.translate();
+                    });
+                }
 
                 // Set some initialized variables
                 cache.initialized = true;

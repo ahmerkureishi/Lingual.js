@@ -29,6 +29,10 @@ module.exports = function(grunt) {
             scripts: {
                 files: 'src/*.js',
                 tasks: ['jshint', 'uglify']
+            },
+            docs: {
+                files: ['README.md', 'docs/template.html'],
+                tasks: ['markdown']
             }
         },
 
@@ -40,13 +44,33 @@ module.exports = function(grunt) {
                 dest: 'dist/lingual.plugins.js'
             }
         },
+
+        markdown: {
+            all: {
+                files: [{
+                    expand: true,
+                    src: 'README.md',
+                    dest: 'docs/',
+                    ext: '.html',
+                    rename: function(d, s){
+                        console.log(d, s);
+                        return d + s.replace('README', 'index');
+                    }
+                }],
+                options: {
+                    template: 'docs/_template.html'
+                }
+            }
+        }
     });
 
     grunt.loadTasks('tasks');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-markdown');
 
     grunt.registerTask('default', ['jshint', 'uglify']);
     grunt.registerTask('develop', ['jshint', 'uglify', 'watch']);
+    grunt.registerTask('docs', ['markdown', 'watch']);
 };
