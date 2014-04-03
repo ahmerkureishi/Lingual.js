@@ -451,6 +451,10 @@
                 cache.initialized = true;
                 cache.finish = new Date().getTime();
 
+                utils.client(function(){
+                    $(d).trigger('lingual:ready');
+                });
+
                 if( typeof cb == "function" ){
                     cb.call(self);
                 }
