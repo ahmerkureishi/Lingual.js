@@ -347,7 +347,7 @@
                                 setTimeout(function(){
                                     // Restore elements display
                                     $this.removeClass(hideClass);
-                                }, 0);
+                                }, 50);
                             }
                         } else {
                             utils.log('Could not find translation for '+translateKey);

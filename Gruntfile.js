@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json');
@@ -33,6 +35,10 @@ module.exports = function(grunt) {
             docs: {
                 files: ['README.md', 'docs/_template.html'],
                 tasks: ['markdown']
+            },
+            manifests: {
+                files: ['package.json'],
+                tasks: ['sync_versions']
             }
         },
 
@@ -53,7 +59,6 @@ module.exports = function(grunt) {
                     dest: 'docs/',
                     ext: '.html',
                     rename: function(d, s){
-                        console.log(d, s);
                         return d + s.replace('README', 'index');
                     }
                 }],
@@ -70,7 +75,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-markdown');
 
-    grunt.registerTask('default', ['jshint', 'uglify']);
-    grunt.registerTask('develop', ['jshint', 'uglify', 'watch']);
+    // Custom task
+    grunt.registerTask('sync_versions', 'Keeps versions in sync between NPM and Bower', function(){
+        var bower = {
+            name: pkg.name,
+            author: pkg.author,
+            version: pkg.version,
+            main: 'dist/lingual.min.js'
+        };
+        fs.writeFileSync('bower.json', JSON.stringify(bower, null, "\t"));
+    });
+
+    grunt.registerTask('default', ['jshint', 'uglify', 'sync_versions']);
+    grunt.registerTask('develop', ['jshint', 'uglify', 'sync_versions', 'watch']);
     grunt.registerTask('docs', ['markdown', 'watch']);
 };
