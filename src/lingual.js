@@ -347,7 +347,7 @@
                                 setTimeout(function(){
                                     // Restore elements display
                                     $this.removeClass(hideClass);
-                                }, 50);
+                                }, (navigator.userAgent.indexOf('Firefox') !== -1 ? 50 : 1));
                             }
                         } else {
                             utils.log('Could not find translation for '+translateKey);
