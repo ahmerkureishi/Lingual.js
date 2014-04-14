@@ -119,6 +119,12 @@
              * @return {String} The language the user is using (or 'en')
              */
             detectLang: function(){
+
+                // IE 10 fix
+                if( !nav.language && nav.browserLanguage ){
+                    nav.language = nav.browserLanguage;
+                }
+
                 var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
                 return self.defaults.lang || cache.html.attr('lang') || detected || 'en';
             },
