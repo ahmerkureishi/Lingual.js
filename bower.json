@@ -1,6 +1,6 @@
 {
 	"name": "Lingual.js",
 	"author": "Maker Studios",
-	"version": "1.8.0",
+	"version": "1.8.2",
 	"main": "dist/lingual.min.js"
 }

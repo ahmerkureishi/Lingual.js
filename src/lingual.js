@@ -278,9 +278,9 @@
                     $toTranslate = $('['+attributeName+']', $el),
                     resetTranslation = false;
 
-                if(self.defaults.fixFloats){
+                if( self.defaults.fixFloats && $('#'+Namespace+'-styles').length === 0 ){
                     var hideClass = Namespace+'-hide';
-                    $('head').append('<style type="text/css">.'+hideClass+'{display: none !important}</style>');
+                    $('head').append('<style type="text/css" id="'+Namespace+'-styles">.'+hideClass+'{display: none !important}</style>');
                 }
 
                 // Do we need to reset our translations?
@@ -344,16 +344,22 @@
                             }
 
                             // Some browsers freak out with floated elements that have no "layout"
-                            if(self.defaults.fixFloats){
+                            if(self.defaults.fixFloats && ( $.inArray( $this.css('float'), ["left", "right"] ) === -1 ) ){
 
                                 // Hide the element
                                 $this.addClass(hideClass);
 
                                 // Thread for new browser reflow
                                 setTimeout(function(){
-                                    // Restore elements display
-                                    $this.removeClass(hideClass);
-                                }, (navigator.userAgent.indexOf('Firefox') !== -1 ? 50 : 1));
+
+                                    // Dirty check to restore original display
+                                    var hax0r = setInterval(function(){
+                                        $this.removeClass(hideClass);
+                                        if( !$this.hasClass(hideClass)){
+                                            clearInterval(hax0r);
+                                        }
+                                    }, 50);
+                                }, 0);
                             }
                         } else {
                             utils.log('Could not find translation for '+translateKey);

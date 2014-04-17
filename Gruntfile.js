@@ -13,7 +13,8 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: "/* " + banner + " */\n",
-                preserveComments: 'some'
+                preserveComments: 'some',
+                footer: "Lingual.version='<%= pkg.version %>';"
             },
             main: {
                 files: {
