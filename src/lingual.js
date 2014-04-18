@@ -276,10 +276,10 @@
                 var selectorKey = self.defaults.selectorKey,
                     attributeName = 'data-'+selectorKey,
                     $toTranslate = $('['+attributeName+']', $el),
-                    resetTranslation = false;
+                    resetTranslation = false,
+                    hideClass = Namespace+'-hide';
 
                 if( self.defaults.fixFloats && $('#'+Namespace+'-styles').length === 0 ){
-                    var hideClass = Namespace+'-hide';
                     $('head').append('<style type="text/css" id="'+Namespace+'-styles">.'+hideClass+'{display: none !important}</style>');
                 }
 
@@ -344,22 +344,15 @@
                             }
 
                             // Some browsers freak out with floated elements that have no "layout"
-                            if(self.defaults.fixFloats && ( $.inArray( $this.css('float'), ["left", "right"] ) === -1 ) ){
+                            if(self.defaults.fixFloats && hideClass && ( $.inArray( $this.css('float'), ["left", "right"] ) === -1 ) ){
 
                                 // Hide the element
                                 $this.addClass(hideClass);
 
                                 // Thread for new browser reflow
                                 setTimeout(function(){
-
-                                    // Dirty check to restore original display
-                                    var hax0r = setInterval(function(){
-                                        $this.removeClass(hideClass);
-                                        if( !$this.hasClass(hideClass)){
-                                            clearInterval(hax0r);
-                                        }
-                                    }, 50);
-                                }, 0);
+                                    $this.removeClass(hideClass);
+                                }, 50);
                             }
                         } else {
                             utils.log('Could not find translation for '+translateKey);
