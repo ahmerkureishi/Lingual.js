@@ -279,8 +279,15 @@
                     resetTranslation = false,
                     hideClass = Namespace+'-hide';
 
-                if( self.defaults.fixFloats && $('#'+Namespace+'-styles').length === 0 ){
-                    $('head').append('<style type="text/css" id="'+Namespace+'-styles">.'+hideClass+'{display: none !important}</style>');
+                if( self.defaults.fixFloats ){
+
+                    if( $('#'+Namespace+'-styles').length === 0 ){
+                        $('head').append('<style type="text/css" id="'+Namespace+'-styles">.'+hideClass+' ['+attributeName+']{display: none !important}</style>');
+                    }
+
+                    if(hideClass){
+                        $('body').addClass(hideClass);
+                    }
                 }
 
                 // Do we need to reset our translations?
@@ -342,23 +349,17 @@
                                     $this.attr(translateTarget, translation);
                                 }
                             }
-
-                            // Some browsers freak out with floated elements that have no "layout"
-                            if(self.defaults.fixFloats && hideClass && ( $.inArray( $this.css('float'), ["left", "right"] ) === -1 ) ){
-
-                                // Hide the element
-                                $this.addClass(hideClass);
-
-                                // Thread for new browser reflow
-                                setTimeout(function(){
-                                    $this.removeClass(hideClass);
-                                }, 50);
-                            }
                         } else {
                             utils.log('Could not find translation for '+translateKey);
                         }
                     }
                 });
+
+                if( self.defaults.fixFloats && hideClass ){
+                    setTimeout(function(){
+                        $('body').removeClass(hideClass);
+                    }, 50);
+                }
 
                 // Trigger our translated event on our element or the document
                 ($el || $(d)).trigger('translated');
@@ -376,6 +377,10 @@
             client: function(locales, opts){
 
                 // Extend our options
+                if( App.globals ){
+                    self.defaults = $.extend(self.defaults, App.globals);
+                }
+
                 self.defaults = $.extend(self.defaults, opts);
                 cache.html = $('html');
 
@@ -570,6 +575,9 @@
             fn.apply(self);
         });
     };
+
+    // Cosmetic assignation
+    App.globals = {};
 
     // Assign Lingual to the global namespace
     if (IsServer) {
