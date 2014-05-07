@@ -2,8 +2,8 @@
 
     "use strict";
 
-    var Namespace = 'Lingual';
-    var IsServer = (typeof module !== 'undefined' && module.exports);
+    var Namespace = "Lingual";
+    var IsServer = (typeof module !== "undefined" && module.exports);
 
     var App = App || function(locales, opts, cb) {
 
@@ -14,10 +14,10 @@
             init;
 
         self.defaults = {
-            lang: '',
-            fallbackLang: 'en',
-            pathDelimiter: '.',
-            selectorKey: 'translate',
+            lang: "",
+            fallbackLang: "en",
+            pathDelimiter: ".",
+            selectorKey: "translate",
             cache: false,
             fixFloats: true,
             variants: false,
@@ -35,7 +35,7 @@
 
             /**
              * Our logging abstraction
-             * @param  {Variable} what Anything you'd want to log
+             * @param  {Variable} what Anything you"d want to log
              * @return {null}
              */
             log: function(what){
@@ -61,7 +61,7 @@
                  * @return {Boolean} If true, browser supports localStorage
                  */
                 supported: function(){
-                    return 'localStorage' in w;
+                    return "localStorage" in w;
                 },
 
                 /**
@@ -91,7 +91,7 @@
              */
             parsePath: function(target, path){
                 if (!path){
-                    return false;
+                    return undefined;
                 }
                 var parts = path.split( self.defaults.pathDelimiter ),
                     i;
@@ -100,7 +100,7 @@
                     if( typeof target[ part ] !== "undefined" ){
                         target = target[ part ];
                     } else {
-                        return false;
+                        return undefined;
                     }
                 }
                 return target;
@@ -116,7 +116,7 @@
 
             /**
              * Attepmts to detect the users default language
-             * @return {String} The language the user is using (or 'en')
+             * @return {String} The language the user is using (or "en")
              */
             detectLang: function(){
 
@@ -125,8 +125,8 @@
                     nav.language = nav.browserLanguage;
                 }
 
-                var detected = (self.defaults.variants) ? nav.language : nav.language.split('-')[0];
-                return self.defaults.lang || cache.html.attr('lang') || detected || 'en';
+                var detected = (self.defaults.variants) ? nav.language : nav.language.split("-")[0];
+                return self.defaults.lang || cache.html.attr("lang") || detected || "en";
             },
 
             /**
@@ -135,7 +135,7 @@
              */
             setLang: function(lang){
                 utils.client(function(){
-                    cache.html.attr('lang', lang);
+                    cache.html.attr("lang", lang);
                 });
                 self.defaults.lang = lang;
             },
@@ -165,6 +165,7 @@
                  * @return {null}
                  */
                 routine: function(locales, complete){
+
 
                     // Set locales
                     if(typeof locales === "string" ){
@@ -224,11 +225,14 @@
                  * @return {String}      The updated string
                  */
                 inject: function(str, args) {
+
+                    if(!str) return;
+
                     args = args || {};
                     var key;
                     for(key in args){
                         if(args.hasOwnProperty(key)){
-                            str = str.replace(':'+key, args[key]);
+                            str = str.replace(":"+key, args[key]);
                         }
                     }
                     return str;
@@ -242,12 +246,12 @@
                  */
                 fetch: function(translateKey, resetTranslation){
 
-                    resetTranslation = ( typeof(resetTranslation) == 'undefined' ) ? false : resetTranslation;
+                    resetTranslation = ( typeof(resetTranslation) == "undefined" ) ? false : resetTranslation;
 
                     var translation = (resetTranslation !== false) ? resetTranslation : utils.parsePath( cache.localeStrings[self.defaults.lang], translateKey );
 
                     // Check if we have a fallback translation for the specified translateKey
-                    if(translation === false && resetTranslation === false && self.defaults.allowFallbackTranslations){
+                    if(translation === undefined && resetTranslation === false && self.defaults.allowFallbackTranslations){
 
                         // No fallback exists
                         if( !(self.defaults.fallbackLang in cache.localeStrings) ){
@@ -274,26 +278,26 @@
 
                 // Gather our elements
                 var selectorKey = self.defaults.selectorKey,
-                    attributeName = 'data-'+selectorKey,
-                    $toTranslate = $('['+attributeName+']', $el),
+                    attributeName = "data-"+selectorKey,
+                    $toTranslate = $("["+attributeName+"]", $el),
                     resetTranslation = false,
-                    hideClass = Namespace+'-hide';
+                    hideClass = Namespace+"-hide";
 
                 if( self.defaults.fixFloats ){
 
-                    if( $('#'+Namespace+'-styles').length === 0 ){
-                        $('head').append('<style type="text/css" id="'+Namespace+'-styles">.'+hideClass+' ['+attributeName+']{display: none !important}</style>');
+                    if( $("#"+Namespace+"-styles").length === 0 ){
+                        $("head").append("<style type=\"text/css\" id=\""+Namespace+"-styles\">."+hideClass+" ["+attributeName+"]{display: none !important}</style>");
                     }
 
                     if(hideClass){
-                        $('body').addClass(hideClass);
+                        $("body").addClass(hideClass);
                     }
                 }
 
                 // Do we need to reset our translations?
                 if(cache.reset){
                     cache.reset = false;
-                    resetTranslation = '';
+                    resetTranslation = "";
                 }
 
                 $toTranslate.each(function(){
@@ -303,7 +307,7 @@
                     if(translateAttr){
 
                         // Check if we are setting an attribute: my.translate.key
-                        var keyData = translateAttr.split(':');
+                        var keyData = translateAttr.split(":");
 
                         // If there is a translateAttr, set it to translateTarget
                         var translateTarget = (keyData.length>1) ? keyData[0] : false;
@@ -321,28 +325,28 @@
                         // Fetch our translation
                         var translation = utils.translate.fetch(translateKey, resetTranslation);
 
-                        if(translation!==false){
+                        if( translation !== undefined ){
 
                             // Check if we need to inject data into our  translation
-                            var translateVars = $this.attr('data-vars');
+                            var translateVars = $this.attr("data-vars");
                             if(translateVars){
                                 try{
                                     translateVars = JSON.parse(translateVars);
                                     translation = utils.translate.inject(translation, translateVars);
                                 } catch(e){
                                     if(self.defaults.debug){
-                                        utils.log('Invalid JSON: ' + translateVars);
+                                        utils.log("Invalid JSON: " + translateVars);
                                     }
                                 }
                             }
 
-                            // If we don't have a translation target, default to html
-                            if( translateTarget === false || translateTarget == 'html' ){
+                            // If we don"t have a translation target, default to html
+                            if( translateTarget === false || translateTarget == "html" ){
                                 $this.html(translation);
                             } else {
 
                                 // a translate target of "text" does not mean an attribute "text"
-                                if(translateTarget == 'text' ){
+                                if(translateTarget == "text" ){
                                     $this.text(translation);
                                 } else {
                                     // Set our translated attribute
@@ -350,19 +354,19 @@
                                 }
                             }
                         } else {
-                            utils.log('Could not find translation for '+translateKey);
+                            utils.log("Could not find translation for "+translateKey);
                         }
                     }
                 });
 
                 if( self.defaults.fixFloats && hideClass ){
                     setTimeout(function(){
-                        $('body').removeClass(hideClass);
+                        $("body").removeClass(hideClass);
                     }, 50);
                 }
 
                 // Trigger our translated event on our element or the document
-                ($el || $(d)).trigger('translated');
+                ($el || $(d)).trigger("translated");
             }
         };
 
@@ -382,7 +386,7 @@
                 }
 
                 self.defaults = $.extend(self.defaults, opts);
-                cache.html = $('html');
+                cache.html = $("html");
 
                 // Set our current language
                 utils.initLang( utils.detectLang() );
@@ -401,7 +405,7 @@
             server: function(locales, opts){
 
                 // Extend our options
-                var extend = require('node.extend');
+                var extend = require("node.extend");
                 self.defaults = extend(self.defaults, opts);
 
                 // Set our current language
@@ -422,12 +426,12 @@
                 // Make sure our language exists, elsewise default to "en"
                 if(!locales[self.defaults.lang]){
 
-                    utils.log('Locales "'+self.defaults.lang+'" do not exist');
+                    utils.log("Locales '"+self.defaults.lang+"' do not exist");
 
                     // Does our fallback even exist?
                     if( locales[self.defaults.fallbackLang] && (self.defaults.fallbackLang !== self.defaults.lang) ){
 
-                        utils.log('Falling back to "'+self.defaults.fallbackLang+'"');
+                        utils.log("Falling back to '"+self.defaults.fallbackLang+"'");
                         utils.setLang(self.defaults.fallbackLang);
 
                     } else {
@@ -436,13 +440,13 @@
                         if( Object.keys && Object.keys(locales).length ){
                             var lastFallbackLang = Object.keys(locales)[0];
 
-                            utils.log('Falling back to "'+lastFallbackLang+'"');
+                            utils.log("Falling back to '"+lastFallbackLang+"'");
 
                             utils.setLang(lastFallbackLang);
 
 
                         } else {
-                            utils.log('Invalid Locale File');
+                            utils.log("Invalid Locale File");
                         }
                     }
                 }
@@ -450,7 +454,7 @@
                 // Set locales
                 utils.setLocales( locales );
 
-                // If we're on the client, translate automatically
+                // If we"re on the client, translate automatically
                 if(self.defaults.autoTranslate){
                     utils.client(function(){
                         action.translate();
@@ -462,7 +466,7 @@
                 cache.finish = new Date().getTime();
 
                 utils.client(function(){
-                    $(d).trigger('lingual:ready');
+                    $(d).trigger("lingual:ready");
                 });
 
                 if( typeof cb == "function" ){
@@ -477,7 +481,7 @@
          * @return {null}
          */
         self.locale = function(locale){
-            if(typeof locale == 'undefined'){
+            if(typeof locale == "undefined"){
                 return self.defaults.lang;
             }
             if( typeof cache.localeStrings[locale] !== "undefined" ){
@@ -513,13 +517,13 @@
          * @return {null}
          */
         self.debug = function(){
-            var debug = Namespace+'-debug';
+            var debug = Namespace+"-debug";
             if( cache.debugging ){
                 cache.debugging = false;
-                $('#'+debug).remove();
+                $("#"+debug).remove();
             } else {
                 cache.debugging = true;
-                $('head').append('<style type="text/css" id="'+debug+'">[data-'+self.defaults.selectorKey+'], .'+debug+'{outline: 1px solid red;}</style>');
+                $("head").append("<style type=\"text/css\" id=\""+debug+"\">[data-"+self.defaults.selectorKey+"], ."+debug+"{outline: 1px solid red;}</style>");
             }
             return self;
         };

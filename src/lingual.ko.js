@@ -23,7 +23,7 @@
                 }
             },
             preprocess: function(val) {
-                return val || 'false';
+                return val || "";
             }
         };
     });
