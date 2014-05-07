@@ -90,18 +90,14 @@
              * @return {Boolean}       Returns the existance of the object
              */
             parsePath: function(target, path){
-                if (!path){
-                    return undefined;
-                }
+                if (!path) return;
                 var parts = path.split( self.defaults.pathDelimiter ),
                     i;
                 for(i=0; i<parts.length; i++){
                     var part = parts[i];
-                    if( typeof target[ part ] !== "undefined" ){
-                        target = target[ part ];
-                    } else {
-                        return undefined;
-                    }
+                    if( typeof target[ part ] == "undefined" ) return;
+
+                    target = target[ part ];
                 }
                 return target;
             },
