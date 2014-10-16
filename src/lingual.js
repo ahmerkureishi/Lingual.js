@@ -209,7 +209,7 @@
                         }
                         cb( locales );
                     });
-                },
+                }
             },
 
             translate: {
@@ -571,9 +571,9 @@
         }
 
         // Call any/all plugins
-        self.plugins.forEach(function(fn){
-            fn.apply(self);
-        });
+        for(var i=0; i<self.plugins.length; i++){
+            self.plugins[i].apply(self);
+        }
     };
 
     // Cosmetic assignation
