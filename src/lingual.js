@@ -137,11 +137,11 @@
             },
 
             /**
-             * Sets translations to be used
+             * Merge localeStrings the current localization keys
              * @param {String} localeStrings A Hash of strings to be used for injecting into the page
              */
-            setLocales: function(localeStrings){
-                cache.localeStrings = localeStrings;
+            updateLocales: function(localeStrings){
+                cache.localeStrings = $.extend(true, cache.localeStrings, localeStrings);
             },
 
             /**
@@ -448,7 +448,7 @@
                 }
 
                 // Set locales
-                utils.setLocales( locales );
+                utils.updateLocales( locales );
 
                 // If we"re on the client, translate automatically
                 if(self.defaults.autoTranslate){
@@ -492,7 +492,7 @@
          */
         self.addLocales = function(locales, cb){
             utils.loader.routine(locales, function(localeData){
-                utils.setLocales( $.extend(true, utils.getLocales(), localeData) );
+                utils.updateLocales( locales );
                 self.translate();
                 if(typeof cb =="function"){
                     cb();
