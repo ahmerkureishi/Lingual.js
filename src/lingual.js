@@ -492,7 +492,7 @@
          */
         self.addLocales = function(locales, cb){
             utils.loader.routine(locales, function(localeData){
-                utils.updateLocales( locales );
+                utils.updateLocales( localeData );
                 self.translate();
                 if(typeof cb =="function"){
                     cb();
